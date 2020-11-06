@@ -1,0 +1,46 @@
+DisablePathCorrection: false
+EnablePathEscape: false
+FireMethodNotAllowed: true
+DisableBodyConsumptionOnUnmarshal: true
+TimeFormat: Mon, 01 Jan 2006 15:04:05 GMT
+Charset: UTF-8
+
+Other:
+  log-level : error
+  port : "8080"
+  build_interval: 180
+  mysql-dsn: lookup:lookup@2019@tcp(172.16.7.226:3306)/mixer?charset=utf8&parseTime=True&loc=Local&timeout=10s&readTimeout=30s&writeTimeout=60s
+  mysql-max-idle: 20
+  mysql-max-open: 50
+  mysql-maxlifetime: 120
+  mysql-log-mode: true
+  kube-config-dir : /etc/kube
+  key: xsyxxsyxxsyxxsyx
+  catalog-concurrency : 1000
+  main-dns-server: 114.114.114.114
+  bak-dns-server: 114.114.114.114
+#  image-repository-domain: harbor.xsts.xyz
+  log-path: /var/log/niwo/
+  swagger-ip: 172.21.101.228
+  qps: 20000
+  bucket-size: 50000
+
+  # database
+  mysql-dev: root:root@tcp(127.0.0.1:3306)/niwo?charset=utf8&parseTime=True&loc=Local&timeout=10s&readTimeout=30s&writeTimeout=60s
+#    ip:
+#    port:
+#    user:
+#    passwd:
+#    database:
+
+  mysql-pro:
+#    ip:
+#    port:
+#    user:
+#    passwd:
+#    database:
+
+  mongodb-dev: mongodb://127.0.0.1:27107
+  mongo-dev-database: niwo
+  mongo-dev-collection: demo
+  mongodb-pro:

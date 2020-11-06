@@ -1,0 +1,361 @@
+definitions:
+  github.com_hfeng101_niwo_controller_catalog_v1.ResponseContent:
+    properties:
+      code:
+        type: integer
+      data:
+        type: object
+      message:
+        type: string
+    type: object
+  github.com_hfeng101_niwo_controller_content_v1.ResponseContent:
+    properties:
+      code:
+        type: integer
+      data:
+        type: object
+      message:
+        type: string
+    type: object
+  github.com_hfeng101_niwo_controller_user_v1.ResponseContent:
+    properties:
+      code:
+        type: integer
+      data:
+        type: object
+      message:
+        type: string
+    type: object
+  v1.AddContentReq:
+    properties:
+      catalogType:
+        type: string
+      content:
+        type: string
+      keyword:
+        type: string
+      theme:
+        type: string
+    type: object
+  v1.GetContentReq:
+    properties:
+      catalogType:
+        type: string
+      theme:
+        type: string
+      uuid:
+        type: string
+    type: object
+  v1.GetEconomicsRecordListReq:
+    type: object
+  v1.GetEntertainmentRecordListReq:
+    type: object
+  v1.GetMilitaryRecordListReq:
+    type: object
+  v1.GetPersonageRecordListReq:
+    type: object
+  v1.GetRecordListByKeywordReq:
+    properties:
+      keyword:
+        type: string
+    type: object
+  v1.GetRecordListReq:
+    type: object
+  v1.GetSportRecordListReq:
+    type: object
+  v1.UpdateContentReq:
+    properties:
+      catalogType:
+        type: string
+      content:
+        type: string
+      keyword:
+        type: string
+      theme:
+        type: string
+      uuid:
+        type: string
+    type: object
+  v1.UserRegistrationReq:
+    properties:
+      email:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+      phoneNumber:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /catalog/economicsRecordList:
+    get:
+      consumes:
+      - application/json
+      description: Get record list of economics record
+      parameters:
+      - description: param
+        in: body
+        name: param
+        required: true
+        schema:
+          $ref: '#/definitions/v1.GetEconomicsRecordListReq'
+      produces:
+      - application/json
+      responses:
+        "20000":
+          schema:
+            $ref: '#/definitions/github.com_hfeng101_niwo_controller_catalog_v1.ResponseContent'
+        "50001":
+          schema:
+            $ref: '#/definitions/github.com_hfeng101_niwo_controller_catalog_v1.ResponseContent'
+  /catalog/entertainmentRecordList:
+    get:
+      consumes:
+      - application/json
+      description: Get record list of entertainment record
+      parameters:
+      - description: param
+        in: body
+        name: param
+        required: true
+        schema:
+          $ref: '#/definitions/v1.GetEntertainmentRecordListReq'
+      produces:
+      - application/json
+      responses:
+        "20000":
+          schema:
+            $ref: '#/definitions/github.com_hfeng101_niwo_controller_catalog_v1.ResponseContent'
+        "50001":
+          schema:
+            $ref: '#/definitions/github.com_hfeng101_niwo_controller_catalog_v1.ResponseContent'
+  /catalog/list:
+    get:
+      consumes:
+      - application/json
+      description: Get record list by keyword search.
+      parameters:
+      - description: param
+        in: body
+        name: param
+        required: true
+        schema:
+          $ref: '#/definitions/v1.GetRecordListReq'
+      produces:
+      - application/json
+      responses:
+        "20000":
+          schema:
+            $ref: '#/definitions/github.com_hfeng101_niwo_controller_catalog_v1.ResponseContent'
+        "50001":
+          schema:
+            $ref: '#/definitions/github.com_hfeng101_niwo_controller_catalog_v1.ResponseContent'
+  /catalog/listByKey:
+    get:
+      consumes:
+      - application/json
+      description: Get record list by keyword search.
+      parameters:
+      - description: param
+        in: body
+        name: param
+        required: true
+        schema:
+          $ref: '#/definitions/v1.GetRecordListByKeywordReq'
+      produces:
+      - application/json
+      responses:
+        "20000":
+          schema:
+            $ref: '#/definitions/github.com_hfeng101_niwo_controller_catalog_v1.ResponseContent'
+        "50001":
+          schema:
+            $ref: '#/definitions/github.com_hfeng101_niwo_controller_catalog_v1.ResponseContent'
+  /catalog/militaryRecordList:
+    get:
+      consumes:
+      - application/json
+      description: Get record list of military record
+      parameters:
+      - description: param
+        in: body
+        name: param
+        required: true
+        schema:
+          $ref: '#/definitions/v1.GetMilitaryRecordListReq'
+      produces:
+      - application/json
+      responses:
+        "20000":
+          schema:
+            $ref: '#/definitions/github.com_hfeng101_niwo_controller_catalog_v1.ResponseContent'
+        "50001":
+          schema:
+            $ref: '#/definitions/github.com_hfeng101_niwo_controller_catalog_v1.ResponseContent'
+  /catalog/personageRecordList:
+    get:
+      consumes:
+      - application/json
+      description: Get record list of personage record
+      parameters:
+      - description: param
+        in: body
+        name: param
+        required: true
+        schema:
+          $ref: '#/definitions/v1.GetPersonageRecordListReq'
+      produces:
+      - application/json
+      responses:
+        "20000":
+          schema:
+            $ref: '#/definitions/github.com_hfeng101_niwo_controller_catalog_v1.ResponseContent'
+        "50001":
+          schema:
+            $ref: '#/definitions/github.com_hfeng101_niwo_controller_catalog_v1.ResponseContent'
+  /catalog/sportRecordList:
+    get:
+      consumes:
+      - application/json
+      description: Get record list of sport record
+      parameters:
+      - description: param
+        in: body
+        name: param
+        required: true
+        schema:
+          $ref: '#/definitions/v1.GetSportRecordListReq'
+      produces:
+      - application/json
+      responses:
+        "20000":
+          schema:
+            $ref: '#/definitions/github.com_hfeng101_niwo_controller_catalog_v1.ResponseContent'
+        "50001":
+          schema:
+            $ref: '#/definitions/github.com_hfeng101_niwo_controller_catalog_v1.ResponseContent'
+  /content/theme:
+    get:
+      consumes:
+      - application/json
+      description: Get content of a record
+      parameters:
+      - description: param
+        in: body
+        name: Param
+        required: true
+        schema:
+          $ref: '#/definitions/v1.GetContentReq'
+      produces:
+      - application/json
+      responses:
+        "20000":
+          schema:
+            $ref: '#/definitions/github.com_hfeng101_niwo_controller_content_v1.ResponseContent'
+        "50001":
+          schema:
+            $ref: '#/definitions/github.com_hfeng101_niwo_controller_content_v1.ResponseContent'
+    post:
+      consumes:
+      - application/json
+      description: Add content of a record
+      parameters:
+      - description: param
+        in: body
+        name: Param
+        required: true
+        schema:
+          $ref: '#/definitions/v1.AddContentReq'
+      produces:
+      - application/json
+      responses:
+        "20000":
+          schema:
+            $ref: '#/definitions/github.com_hfeng101_niwo_controller_content_v1.ResponseContent'
+        "50001":
+          schema:
+            $ref: '#/definitions/github.com_hfeng101_niwo_controller_content_v1.ResponseContent'
+    put:
+      consumes:
+      - application/json
+      description: Update content of a record
+      parameters:
+      - description: param
+        in: body
+        name: Param
+        required: true
+        schema:
+          $ref: '#/definitions/v1.UpdateContentReq'
+      produces:
+      - application/json
+      responses:
+        "20000":
+          schema:
+            $ref: '#/definitions/github.com_hfeng101_niwo_controller_content_v1.ResponseContent'
+        "50001":
+          schema:
+            $ref: '#/definitions/github.com_hfeng101_niwo_controller_content_v1.ResponseContent'
+  /login:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: param
+        in: body
+        name: param
+        required: true
+        schema:
+          $ref: '#/definitions/v1.UserRegistrationReq'
+      produces:
+      - application/json
+      responses:
+        "20000":
+          schema:
+            $ref: '#/definitions/github.com_hfeng101_niwo_controller_user_v1.ResponseContent'
+        "50001":
+          schema:
+            $ref: '#/definitions/github.com_hfeng101_niwo_controller_user_v1.ResponseContent'
+  /logout:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: param
+        in: body
+        name: param
+        required: true
+        schema:
+          $ref: '#/definitions/v1.UserRegistrationReq'
+      produces:
+      - application/json
+      responses:
+        "20000":
+          schema:
+            $ref: '#/definitions/github.com_hfeng101_niwo_controller_user_v1.ResponseContent'
+        "50001":
+          schema:
+            $ref: '#/definitions/github.com_hfeng101_niwo_controller_user_v1.ResponseContent'
+  /user/registration:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: param
+        in: body
+        name: param
+        required: true
+        schema:
+          $ref: '#/definitions/v1.UserRegistrationReq'
+      produces:
+      - application/json
+      responses:
+        "20000":
+          schema:
+            $ref: '#/definitions/github.com_hfeng101_niwo_controller_user_v1.ResponseContent'
+        "50001":
+          schema:
+            $ref: '#/definitions/github.com_hfeng101_niwo_controller_user_v1.ResponseContent'
+swagger: "2.0"
