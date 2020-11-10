@@ -9,7 +9,7 @@ Other:
   log-level : error
   port : "8080"
   build_interval: 180
-  mysql-dsn: lookup:lookup@2019@tcp(172.16.7.226:3306)/mixer?charset=utf8&parseTime=True&loc=Local&timeout=10s&readTimeout=30s&writeTimeout=60s
+  mysql-dsn: lookup:lookup@2019@tcp(127.0.0.1:3306)/mixer?charset=utf8&parseTime=True&loc=Local&timeout=10s&readTimeout=30s&writeTimeout=60s
   mysql-max-idle: 20
   mysql-max-open: 50
   mysql-maxlifetime: 120
@@ -25,8 +25,8 @@ Other:
   qps: 20000
   bucket-size: 50000
 
-  # database
-  mysql-dev: root:root@tcp(127.0.0.1:3306)/niwo?charset=utf8&parseTime=True&loc=Local&timeout=10s&readTimeout=30s&writeTimeout=60s
+  # database mysql -h 127.0.0.1 -P 3306 -ulookup -plookup@2019
+  mysql-dev: lookup:lookup@2019@tcp(127.0.0.1:3306)/niwo?charset=utf8&parseTime=True&loc=Local&timeout=10s&readTimeout=30s&writeTimeout=60s
 #    ip:
 #    port:
 #    user:
@@ -40,6 +40,7 @@ Other:
 #    passwd:
 #    database:
 
+##mongo 127.0.0.1:27107
   mongodb-dev: mongodb://127.0.0.1:27107
   mongo-dev-database: niwo
   mongo-dev-collection: demo

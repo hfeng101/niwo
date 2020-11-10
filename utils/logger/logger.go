@@ -10,7 +10,7 @@ func init() {
 <seelog type="asynctimer" asyncinterval="1000000" minlevel="debug" maxlevel="error">
 	<outputs formatid="kube">
 		<console/>
-		<rollingfile formatid="kube" type="size" filename="/var/log/mixer.log" maxsize="1000000" maxrolls="5" />
+		<rollingfile formatid="kube" type="size" filename="/var/log/niwo.log" maxsize="1000000" maxrolls="5" />
 	</outputs>
 	<formats>
 		<format id="kube" format="[%Date %Time %LEVEL %FullPath %Func %Line]: %Msg%n"/>
@@ -29,7 +29,7 @@ func SwitchLoggerLevel(level string) {
 <seelog type="asynctimer" asyncinterval="1000000" minlevel="`+level+`" maxlevel="error">
 	<outputs formatid="kube">
 		<console/>
-		<rollingfile formatid="kube" type="size" filename="/var/log/mixer.log" maxsize="1000000" maxrolls="5" />
+		<rollingfile formatid="kube" type="size" filename="/var/log/niwo.log" maxsize="1000000" maxrolls="5" />
 	</outputs>
 	<formats>
 		<format id="kube" format="[%Date %Time %LEVEL %FullPath %Func %Line]: %Msg%n"/>

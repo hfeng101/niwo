@@ -16,12 +16,18 @@ limitations under the License.
 package cmd
 
 import (
+  "context"
   "fmt"
   "github.com/cihub/seelog"
   "github.com/hfeng101/niwo/database"
   "github.com/hfeng101/niwo/utils/config"
+  "github.com/hfeng101/niwo/utils/logger"
   "github.com/spf13/cobra"
   "os"
+  "os/signal"
+  "runtime"
+  "syscall"
+  "time"
 
   homedir "github.com/mitchellh/go-homedir"
   "github.com/spf13/viper"
@@ -29,7 +35,7 @@ import (
   "github.com/hfeng101/niwo/router"
 
   "github.com/kataras/iris/v12"
-  "github.com/kataras/iris/v12/middleware/logger"
+  IrisLogger "github.com/kataras/iris/v12/middleware/logger"
   "github.com/kataras/iris/v12/middleware/recover"
 )
 
@@ -111,38 +117,140 @@ func run(cmd *cobra.Command, args []string) {
   //init mysql & create table
   database.InitGlobalOrm()
   db := database.GetMysqlDbHandle()
-  //if db == nil {
-  //  seelog.Errorf("GetMysqlDbHandle failed, mysql init failed")
-  //  return
-  //}
+  if db == nil {
+    seelog.Errorf("GetMysqlDbHandle failed, mysql init failed")
+    return
+  }
 
   defer db.Close()
-  //if db.AutoMigrate(&database.UserInfo{}, &database.ThemeCatalog{},&database.EconomicsRecordList{},&database.MilitaryRecordList{},
-  //  &database.PersonageRecordList{}, &database.SportRecordList{}, &database.EntertainmentRecordList{}) == nil {
-  //  seelog.Errorf("AutoMigrate failed, mysql init failed")
-  //  return
-  //}
+  if db.AutoMigrate(&database.UserInfo{}, &database.ThemeCatalog{},&database.EconomicsRecordList{},&database.MilitaryRecordList{},
+   &database.PersonageRecordList{}, &database.SportRecordList{}, &database.EntertainmentRecordList{}) == nil {
+    seelog.Errorf("AutoMigrate failed, mysql init failed")
+    return
+  }
+
+  //init mongoDB
+  database.InitMongoDb()
 
   //start iris app
-  if err := startIrisApp(cmd, args);err != nil {
+  exitChan := make(chan struct{})
+  if err := startIrisApp(exitChan);err != nil {
     seelog.Errorf("startIrisApp failed, err is %v", err.Error())
     return
   }
+
+  <-exitChan
 }
 
-func startIrisApp(cmd *cobra.Command, args []string) error{
+func startIrisApp(exitChan chan struct{}) error{
   app := iris.New()
   app.Use(recover.New())
-  app.Use(logger.New())
+  app.Use(IrisLogger.New())
 
   //iris.WithConfiguration(iris.YAML("../config/config.yml"))
+  ctx, cancelFunc := context.WithCancel(context.Background())
 
+  //Catch the INT & TERM signal and overwrite the default action.
+  go gracefulExit(cancelFunc, app, ctx, exitChan, 10*time.Second)
+
+  //Catch USR1 signal to all Gs' stack.
+  go runtimeStackInfo(ctx)
+
+  //Catch HUP system signal to reload the configuration file.
+  go reloadConfiguration(ctx)
+
+  //Run iris server
   Router.RegistryRoutes(app)
-
   if err := app.Run(iris.Addr(":8080"), iris.WithoutServerError(iris.ErrServerClosed)); err != nil{
     seelog.Errorf("Run app failed, err is %v", err.Error())
     return err
   }
 
   return nil
+}
+
+func reloadConfiguration(ctx context.Context) {
+  hupSigChan := make(chan os.Signal)
+  //catch HUP signal
+  signal.Notify(hupSigChan, syscall.SIGHUP)
+
+  for {
+    select {
+      case _, ok := <-hupSigChan:
+        if ok {
+          config.InitIrisConfig()
+          //logger setting
+          switch config.GetConfig().Other["log-level"].(string) {
+            case "debug":
+              logger.SwitchLoggerLevel("debug")
+            case "info":
+              logger.SwitchLoggerLevel("info")
+            case "warn":
+              logger.SwitchLoggerLevel("warn")
+            case "error":
+              logger.SwitchLoggerLevel("error")
+            default:
+              logger.SwitchLoggerLevel("info")
+          }
+
+          //reload mysql
+          database.InitGlobalOrm()
+
+          //reload mongodb
+          database.InitMongoDb()
+        }
+      case <-ctx.Done():
+        return
+      }
+  }
+}
+
+//优雅退出
+func gracefulExit(cancelFunc context.CancelFunc, app *iris.Application, ctx context.Context, exitChan chan struct{}, waitPeriod time.Duration) {
+  defer seelog.Flush()
+  var exitSignalCnt int
+  exitSignalChan := make(chan os.Signal)
+  //catch INT and TERM signal
+  signal.Notify(exitSignalChan, syscall.SIGINT, syscall.SIGTERM)
+  for {
+    select {
+    case s, ok := <-exitSignalChan:
+      if ok {
+        exitSignalCnt++
+        seelog.Debugf("The %vth signal recved: %v", exitSignalCnt, s)
+        if exitSignalCnt < 2 {
+          seelog.Infof("waiting for running process to finish before shutting down, take care to press ctrl+c to quit abruptly")
+          go func() {
+            cancelFunc()
+            seelog.Infof("main process exit %v later", waitPeriod)
+            app.Shutdown(ctx)
+            time.Sleep(waitPeriod)
+            seelog.Infof("quit gracefully")
+            exitChan <- struct{}{}
+          }()
+        } else {
+          seelog.Infof("quit abruptly")
+          exitChan <- struct{}{}
+        }
+      }
+    }
+  }
+}
+
+func runtimeStackInfo(ctx context.Context) {
+  user1SigChan := make(chan os.Signal)
+  //catch USER1 signal
+  signal.Notify(user1SigChan, syscall.SIGUSR1)
+  for {
+    select {
+    case _, ok := <-user1SigChan:
+      if ok {
+        stackBuff := make([]byte, 1<<16)
+        n := runtime.Stack(stackBuff, true)
+        fmt.Println(string(stackBuff[:n]))
+      }
+    case <-ctx.Done():
+      return
+    }
+  }
 }

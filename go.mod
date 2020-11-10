@@ -48,6 +48,7 @@ require (
 	golang.org/x/text v0.3.4 // indirect
 	golang.org/x/tools v0.0.0-20201102212025-f46e4245211d // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
+	google.golang.org/genproto v0.0.0-20200526211855-cb27e3aa2013
 	google.golang.org/protobuf v1.25.0 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20200615113413-eeeca48fe776 // indirect
 )
