@@ -6,21 +6,20 @@ type ResponseContent struct {
 	Data interface{} `json:"data"`
 }
 
-//type GetPersonageRecordReq struct {
-//
-//}
-
-type UserRegistrationReq struct {
-	Name string `json:"name"`
-	Email string `json:"email"`
+type UserRegistrationOrLoginReq struct {
+	//Name string `json:"name"`
+	//Email string `json:"email"`
 	PhoneNumber string `json:"phoneNumber"`
-	Password string `json:"password"`
+	//Password string `json:"password"`
+	VerificationCode string `json:"verificationCode"`
 }
 
-type UserInfo struct {
-	Id int64 `json:"userId"`
-	Name string `json:"name"`
-	Email string `json:"email"`
+type VerifyLoginReq struct {
 	PhoneNumber string `json:"phoneNumber"`
-	Password string `json:"password"`
+	Token string `json:"token"`
+}
+
+type UpdateTokenReq struct {
+	PhoneNumber string `json:"phoneNumber"`
+	FreshToken string `json:"freshToken"`
 }

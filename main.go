@@ -17,8 +17,12 @@ package main
 
 import (
   "github.com/hfeng101/niwo/cmd"
+  "math/rand"
+  "time"
 )
 
 func main() {
+  rand.Seed(time.Now().UnixNano())
+
   cmd.Execute()
 }

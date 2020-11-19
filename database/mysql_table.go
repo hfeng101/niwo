@@ -8,8 +8,12 @@ type UserInfo struct {
 	Uuid string `gorm:"column:uuid;type:varchar(128)"`
 	Name string `gorm:"column:name;type:varchar(128)"`
 	Password string `gorm:"column:password;type:varchar(128)"`
-	PhoneNumber string `gorm:"column:phone_number;type:varchar(128)"`
+	PhoneNumber string `gorm:"column:phone_number;type:varchar(16)"`
+	VerificationCode string `gorm:"column:verification_code;type:varchar(8)"`
 	Email string `gorm:"column:email;type:varchar(128)"`
+	Token string `gorm:"column:token;type:varchar(64)"`
+	RefreshToken string `gorm:"column:refresh_token;type:varchar(64)"`
+	Secret string `gorm:"column:secret;type:varchar(8)"`
 }
 
 func (*UserInfo)TableName() string{
