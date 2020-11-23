@@ -19,7 +19,7 @@ import (
   "context"
   "fmt"
   "github.com/cihub/seelog"
-  "github.com/hfeng101/niwo/database"
+  "github.com/hfeng101/niwo/storage"
   "github.com/hfeng101/niwo/utils/config"
   "github.com/hfeng101/niwo/utils/logger"
   "github.com/spf13/cobra"
@@ -115,22 +115,22 @@ func run(cmd *cobra.Command, args []string) {
   config.InitIrisConfig()
 
   //init mysql & create table
-  database.InitGlobalOrm()
-  db := database.GetMysqlDbHandle()
+  storage.InitGlobalOrm()
+  db := storage.GetMysqlDbHandle()
   if db == nil {
     seelog.Errorf("GetMysqlDbHandle failed, mysql init failed")
     return
   }
 
   defer db.Close()
-  if db.AutoMigrate(&database.UserInfo{}, &database.ThemeCatalog{},&database.EconomicsRecordList{},&database.MilitaryRecordList{},
-   &database.PersonageRecordList{}, &database.SportRecordList{}, &database.EntertainmentRecordList{}) == nil {
+  if db.AutoMigrate(&storage.UserInfo{}, &storage.ThemeCatalog{},&storage.EconomicsRecordList{},&storage.MilitaryRecordList{},
+   &storage.PersonageRecordList{}, &storage.SportRecordList{}, &storage.EntertainmentRecordList{}) == nil {
     seelog.Errorf("AutoMigrate failed, mysql init failed")
     return
   }
 
   //init mongoDB
-  database.InitMongoDb()
+  storage.InitMongoDb()
 
   //start iris app
   exitChan := make(chan struct{})
@@ -194,10 +194,10 @@ func reloadConfiguration(ctx context.Context) {
           }
 
           //reload mysql
-          database.InitGlobalOrm()
+          storage.InitGlobalOrm()
 
           //reload mongodb
-          database.InitMongoDb()
+          storage.InitMongoDb()
         }
       case <-ctx.Done():
         return

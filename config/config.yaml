@@ -25,20 +25,20 @@ Other:
   qps: 20000
   bucket-size: 50000
 
-  # database mysql -h 127.0.0.1 -P 3306 -ulookup -plookup@2019
+  # storage mysql -h 127.0.0.1 -P 3306 -ulookup -plookup@2019
   mysql-dev: lookup:lookup@2019@tcp(127.0.0.1:3306)/niwo?charset=utf8&parseTime=True&loc=Local&timeout=10s&readTimeout=30s&writeTimeout=60s
 #    ip:
 #    port:
 #    user:
 #    passwd:
-#    database:
+#    storage:
 
   mysql-pro:
 #    ip:
 #    port:
 #    user:
 #    passwd:
-#    database:
+#    storage:
 
 ##mongo 127.0.0.1:27107
   mongodb-dev: mongodb://127.0.0.1:27107

@@ -7,6 +7,7 @@ require (
 	github.com/Joker/hpp v1.0.0 // indirect
 	github.com/ajg/form v1.5.1 // indirect
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
+	github.com/aliyun/aliyun-oss-go-sdk v2.1.5+incompatible // indirect
 	github.com/andybalholm/brotli v1.0.1-0.20200619015827-c3da72aa01ed // indirect
 	github.com/cihub/seelog v0.0.0-20170130134532-f561c5e57575
 	github.com/dgraph-io/badger v1.6.0 // indirect
@@ -35,6 +36,7 @@ require (
 	github.com/spf13/cobra v1.1.0
 	github.com/spf13/viper v1.7.1
 	github.com/swaggo/swag v1.6.9
+	github.com/tencentyun/cos-go-sdk-v5 v0.7.11 // indirect
 	github.com/urfave/cli/v2 v2.3.0 // indirect
 	github.com/valyala/fasthttp v1.16.0 // indirect
 	github.com/xeipuuv/gojsonschema v1.2.0 // indirect

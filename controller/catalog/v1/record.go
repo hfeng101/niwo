@@ -1,53 +1,53 @@
 package v1
 
 import (
-	"github.com/hfeng101/niwo/database"
+	"github.com/hfeng101/niwo/storage"
 )
 
-func GetListByKeywordFromPersonageRecord(key string)  ([]*database.PersonageRecordList, error){
-	personageRecordList := []*database.PersonageRecordList{}
+func GetListByKeywordFromPersonageRecord(key string)  ([]*storage.PersonageRecordList, error){
+	personageRecordList := []*storage.PersonageRecordList{}
 
-	dbHandle := database.GetMysqlDbHandle()
+	dbHandle := storage.GetMysqlDbHandle()
 	//关键字模糊查找
 	dbHandle.Where("theme like", "%"+key+"%").Find(personageRecordList)
 
 	return personageRecordList,nil
 }
 
-func GetListByKeywordFromSportRecord(key string) ([]*database.SportRecordList,error) {
-	sportRecordList := []*database.SportRecordList{}
+func GetListByKeywordFromSportRecord(key string) ([]*storage.SportRecordList,error) {
+	sportRecordList := []*storage.SportRecordList{}
 
-	dbHandle := database.GetMysqlDbHandle()
+	dbHandle := storage.GetMysqlDbHandle()
 	//关键字模糊查找
 	dbHandle.Where("theme like", "%"+key+"%").Find(sportRecordList)
 
 	return sportRecordList,nil
 }
 
-func GetListByKeywordFromEconomicsRecord(key string) ([]*database.EconomicsRecordList,error){
-	economicsRecordList := []*database.EconomicsRecordList{}
+func GetListByKeywordFromEconomicsRecord(key string) ([]*storage.EconomicsRecordList,error){
+	economicsRecordList := []*storage.EconomicsRecordList{}
 
-	dbHandle := database.GetMysqlDbHandle()
+	dbHandle := storage.GetMysqlDbHandle()
 	//关键字模糊查找
 	dbHandle.Where("theme like", "%"+key+"%").Find(economicsRecordList)
 
 	return economicsRecordList,nil
 }
 
-func GetListByKeywordFromMilitaryRecord(key string) ([]*database.MilitaryRecordList,error){
-	militaryRecordList := []*database.MilitaryRecordList{}
+func GetListByKeywordFromMilitaryRecord(key string) ([]*storage.MilitaryRecordList,error){
+	militaryRecordList := []*storage.MilitaryRecordList{}
 
-	dbHandle := database.GetMysqlDbHandle()
+	dbHandle := storage.GetMysqlDbHandle()
 	//关键字模糊查找
 	dbHandle.Where("theme like", "%"+key+"%").Find(militaryRecordList)
 
 	return militaryRecordList,nil
 }
 
-func GetListByKeywordFromEntertainmentRecord(key string) ([]*database.EntertainmentRecordList,error){
-	entertainmentRecordList := []*database.EntertainmentRecordList{}
+func GetListByKeywordFromEntertainmentRecord(key string) ([]*storage.EntertainmentRecordList,error){
+	entertainmentRecordList := []*storage.EntertainmentRecordList{}
 
-	dbHandle := database.GetMysqlDbHandle()
+	dbHandle := storage.GetMysqlDbHandle()
 	//关键字模糊查找
 	dbHandle.Where("theme like", "%"+key+"%").Find(entertainmentRecordList)
 

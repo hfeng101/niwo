@@ -6,6 +6,13 @@ type ResponseContent struct {
 	Data interface{} `json:"data"`
 }
 
+type LoginResponseInfo struct {
+	PhoneNumber string `json:"phoneNumber"`
+	Name string	`json:"name"`
+	Token string `json:"token"`
+	RefreshToken string `json:"refreshToken"`
+}
+
 type UserRegistrationOrLoginReq struct {
 	//Name string `json:"name"`
 	//Email string `json:"email"`
@@ -22,4 +29,9 @@ type VerifyLoginReq struct {
 type UpdateTokenReq struct {
 	PhoneNumber string `json:"phoneNumber"`
 	FreshToken string `json:"freshToken"`
+}
+
+
+type LogoutReq struct {
+	PhoneNumber string `json:"phoneNumber"`
 }

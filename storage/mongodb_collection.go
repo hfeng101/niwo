@@ -1,4 +1,4 @@
-package database
+package storage
 
 //通用记录内容
 type GenerationRecordContent struct {

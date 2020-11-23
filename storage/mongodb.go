@@ -1,4 +1,4 @@
-package database
+package storage
 
 import (
 	"context"
@@ -37,9 +37,9 @@ func InitMongoDb() {
 	}
 
 	//待定
-	MongoDbHandle = MongoDbClient.Database(config.GetConfig().Other["mongo-dev-database"].(string))
-	//MongoDbCollectionHandle = MongoDbHandle.Database(config.GetConfig().Other["mongo-dev-database"].(string)).Collection(config.GetConfig().Other["mongo-dev-collection"].(string))
-	//MongoDbCollectionHandle = MongoDbClient.Database(config.GetConfig().Other["mongo-dev-database"].(string)).Collection(config.GetConfig().Other["mongo-dev-collection"].(string))
+	MongoDbHandle = MongoDbClient.Database(config.GetConfig().Other["mongo-dev-storage"].(string))
+	//MongoDbCollectionHandle = MongoDbHandle.Database(config.GetConfig().Other["mongo-dev-storage"].(string)).Collection(config.GetConfig().Other["mongo-dev-collection"].(string))
+	//MongoDbCollectionHandle = MongoDbClient.Database(config.GetConfig().Other["mongo-dev-storage"].(string)).Collection(config.GetConfig().Other["mongo-dev-collection"].(string))
 	collections := []string{
 		consts.PERSONAGE,
 		consts.SPORT,
@@ -76,10 +76,10 @@ func GetMongoDbCollectionHandle() *mongo.Collection{
 func CreateMongoCollectionAndIndex(collections []string) error {
 	for _,collection := range(collections) {
 		//创建collection
-		mixerCollection := MongoDbHandle.Collection(collection)
+		niwoCollection := MongoDbHandle.Collection(collection)
 
 		expireIn := int32(360000000)
-		_, err := mixerCollection.Indexes().CreateMany(context.Background(), []mongo.IndexModel{
+		_, err := niwoCollection.Indexes().CreateMany(context.Background(), []mongo.IndexModel{
 			{
 				Keys:    bson.M{"uuid": 1},
 				Options: options.Index().SetBackground(true).SetExpireAfterSeconds(expireIn),

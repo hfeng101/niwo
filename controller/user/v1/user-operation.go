@@ -5,7 +5,7 @@ import (
 	"github.com/cihub/seelog"
 	"github.com/dgrijalva/jwt-go"
 	uuid2 "github.com/google/uuid"
-	"github.com/hfeng101/niwo/database"
+	"github.com/hfeng101/niwo/storage"
 	"github.com/hfeng101/niwo/utils/consts"
 	"github.com/kataras/iris/v12"
 	"math/rand"
@@ -75,7 +75,12 @@ func Login(ctx iris.Context){
 		rsp.Message = consts.ERRORCODEMESSAGE + err.Error()
 		return
 	}else {
-		rsp.Data = userInfo
+		rsp.Data = LoginResponseInfo{
+			PhoneNumber: userInfo.PhoneNumber,
+			Name: userInfo.Name,
+			Token: userInfo.Token,
+			RefreshToken: userInfo.RefreshToken,
+		}
 		return
 	}
 
@@ -83,17 +88,105 @@ func Login(ctx iris.Context){
 
 //用户打开app验证token是否过期来确认登陆，过期返回warning
 func VerifyLogin(ctx iris.Context) {
+	rsp := &ResponseContent{
+		Code: consts.SUCCESSCODE,
+		Message: consts.SUCCESSCODEMESSAGE,
+	}
+	req := &VerifyLoginReq{}
 
+	defer ctx.JSON(rsp)
+	if err := ctx.ReadJSON(req); err != nil {
+		seelog.Errorf("Error, input param is invalid, err is %v", err.Error())
+		rsp.Code = consts.ERRORCODE
+		rsp.Message = consts.ERRORCODEMESSAGE + err.Error()
+		return
+	}
+
+	if err := verifyToken(req); err != nil {
+		seelog.Errorf("verifyToken failed, err is %v", err.Error())
+		rsp.Code = consts.ERRORCODE
+		rsp.Message = consts.ERRORCODEMESSAGE + err.Error()
+
+		//http返回401
+		ctx.StatusCode(401)
+		return
+	}
 }
 
 //用户通过refreshToken更新token
 func UpdateToken(ctx iris.Context) {
+	rsp := &ResponseContent{
+		Code: consts.SUCCESSCODE,
+		Message: consts.SUCCESSCODEMESSAGE,
+	}
+	req := &UpdateTokenReq{}
 
+	defer ctx.JSON(rsp)
+	if err := ctx.ReadJSON(req); err != nil {
+		seelog.Errorf("Error, input param is invalid, err is %v", err.Error())
+		rsp.Code = consts.ERRORCODE
+		rsp.Message = consts.ERRORCODEMESSAGE + err.Error()
+		return
+	}
+
+	userInfoList := []*storage.UserInfo{}
+
+	mysqlHandle := storage.GetMysqlDbHandle()
+	mysqlHandle.Where("phone_number=%s", req.PhoneNumber).First(userInfoList)
+	if len(userInfoList) != 1{
+		seelog.Errorf("Get user info from mysql failed")
+		rsp.Code = consts.ERRORCODE
+		rsp.Message = consts.ERRORCODEMESSAGE + "Update failed, Get user info from mysql failed"
+		return
+	}
+
+	if userInfoList[0].PhoneNumber == req.PhoneNumber && userInfoList[0].RefreshToken == req.FreshToken{
+		loginInfo := &UserRegistrationOrLoginReq{
+			PhoneNumber: req.PhoneNumber,
+			VerificationCode: userInfoList[0].VerificationCode,
+		}
+
+		if userInfo,err := getToken(loginInfo); err != nil{
+			seelog.Errorf("getToken failed, can not generate new token, err is %v", err.Error())
+			rsp.Code = consts.ERRORCODE
+			rsp.Message = consts.ERRORCODEMESSAGE + "Update failed, Get user info from mysql failed"
+			return
+		}else {
+			rsp.Data = LoginResponseInfo{
+				PhoneNumber: userInfo.PhoneNumber,
+				Name: userInfo.Name,
+				Token: userInfo.Token,
+				RefreshToken: userInfo.RefreshToken,
+			}
+
+			return
+		}
+	}
 }
 
-//退出清空token和验证码
+//退出清空验证码、token、refreshToken
 func Logout(ctx iris.Context) {
+	rsp := &ResponseContent{
+		Code: consts.SUCCESSCODE,
+		Message: consts.SUCCESSCODEMESSAGE,
+	}
+	req := &LogoutReq{}
 
+	defer ctx.JSON(rsp)
+	if err := ctx.ReadJSON(req); err != nil {
+		seelog.Errorf("Error, input param is invalid, err is %v", err.Error())
+		rsp.Code = consts.ERRORCODE
+		rsp.Message = consts.ERRORCODEMESSAGE + err.Error()
+		return
+	}
+
+	mysqlHandle := storage.GetMysqlDbHandle()
+	if err := mysqlHandle.Where("phone_number=%s", req.PhoneNumber).Updates(storage.UserInfo{VerificationCode: "", Token: "", RefreshToken: ""}).Error; err != nil {
+		seelog.Errorf("Clean  VerificationCode、Token、RefreshToken failed, err is %v", err.Error())
+		rsp.Code = consts.ERRORCODE
+		rsp.Message = consts.ERRORCODEMESSAGE
+		return
+	}
 }
 
 func Registration(ctx iris.Context) {
@@ -117,19 +210,22 @@ func generateVerificationCode(phoneNumber string) (string,error){
 
 //存储验证码，若用户存在则直接更新，若不存在则创建
 func storeVerificationCode(phoneNumber string, verificationCode string) error{
-	mysqlHandle := database.GetMysqlDbHandle()
-	userInfoList := []*database.UserInfo{}
-	mysqlHandle.Where("phone_number=%s",phoneNumber).Find(userInfoList)
+	mysqlHandle := storage.GetMysqlDbHandle()
+	userInfoList := []*storage.UserInfo{}
+	mysqlHandle.Where("phone_number=%s",phoneNumber).First(userInfoList)
 
 	if len(userInfoList) == 1 {
 		//直接更新
-		mysqlHandle.Where("phone_number=%s",phoneNumber).Update("verification_code", verificationCode)
+		if err := mysqlHandle.Where("phone_number=%s",phoneNumber).Update("verification_code", verificationCode).Error; err != nil {
+			seelog.Errorf("update failed , err is %v", err.Error())
+			return err
+		}
 	}else if len(userInfoList) == 0 {
 		//新建用户信息，新用户，直接注册
 		uuid := uuid2.New().String()
 		name := "new"+phoneNumber
 
-		userInfo := &database.UserInfo{
+		userInfo := &storage.UserInfo{
 			Uuid: uuid,
 			Name: name,
 			Password: "",
@@ -140,7 +236,10 @@ func storeVerificationCode(phoneNumber string, verificationCode string) error{
 			RefreshToken: "",
 			Secret: "",
 		}
-		mysqlHandle.Create(userInfo)
+		if err := mysqlHandle.Create(userInfo).Error; err != nil {
+			seelog.Errorf("create user info failed, err is %v", err.Error())
+			return err
+		}
 	}else{
 		seelog.Errorf("storeVerificationCode failed, Get userInfo more than 2")
 		err := errors.New("storeVerificationCode failed, Get userInfo more than 2")
@@ -157,11 +256,11 @@ func pushVerificationCode(verificationCode string) error{
 }
 
 //生成token，并写入到用户表
-func getToken(loginInfo *UserRegistrationOrLoginReq) (*database.UserInfo,error){
-	userInfo := &database.UserInfo{}
-	mysqlHandle := database.GetMysqlDbHandle()
-	userInfoList := []*database.UserInfo{}
-	mysqlHandle.Where("phone_number=%s", loginInfo.PhoneNumber).Find(userInfoList)
+func getToken(loginInfo *UserRegistrationOrLoginReq) (*storage.UserInfo,error){
+	userInfo := &storage.UserInfo{}
+	mysqlHandle := storage.GetMysqlDbHandle()
+	userInfoList := []*storage.UserInfo{}
+	mysqlHandle.Where("phone_number=%s", loginInfo.PhoneNumber).First(userInfoList)
 
 	secret := strconv.Itoa(rand.Intn(999999))
 
@@ -177,7 +276,10 @@ func getToken(loginInfo *UserRegistrationOrLoginReq) (*database.UserInfo,error){
 		userInfo.Token = token
 		userInfo.RefreshToken = refreshToken
 
-		mysqlHandle.Where("phone_number=%s",loginInfo.PhoneNumber).Update("verification_code", loginInfo.VerificationCode)
+		if err := mysqlHandle.Where("phone_number=%s",loginInfo.PhoneNumber).Update("verification_code", loginInfo.VerificationCode).Error; err != nil {
+			seelog.Errorf("update failed, err is %v", err.Error())
+			return nil, err
+		}
 	}else{
 		seelog.Errorf("storeVerificationCode failed, Get userInfo not equal 1")
 		err := errors.New("storeVerificationCode failed, Get userInfo equal 1")
@@ -218,10 +320,10 @@ func generateToken(loginInfo *UserRegistrationOrLoginReq, secret string)(string,
 }
 
 func verifyToken(param *VerifyLoginReq) error{
-	userInfo := []*database.UserInfo{}
+	userInfo := []*storage.UserInfo{}
 
-	mysqlHandle := database.GetMysqlDbHandle()
-	mysqlHandle.Where("phone_number=%s",param.PhoneNumber).Find(userInfo)
+	mysqlHandle := storage.GetMysqlDbHandle()
+	mysqlHandle.Where("phone_number=%s",param.PhoneNumber).First(userInfo)
 
 	token, err := jwt.ParseWithClaims(param.Token, &JwtClaims{}, func(token *jwt.Token)(interface{}, error){
 		return []byte(userInfo[0].Secret), nil

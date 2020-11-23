@@ -2,7 +2,7 @@ package v1
 
 import (
 	"github.com/cihub/seelog"
-	"github.com/hfeng101/niwo/database"
+	"github.com/hfeng101/niwo/storage"
 	"github.com/hfeng101/niwo/utils/consts"
 	"github.com/kataras/iris/v12"
 )
@@ -124,9 +124,9 @@ func GetRecordList(ctx iris.Context) {
 	//从数据库里获取列表，并分列显示
 	switch req.catalog {
 		case consts.PERSONAGE:
-			personageRecordList := []*database.PersonageRecordList{}
+			personageRecordList := []*storage.PersonageRecordList{}
 			//从数据库里获取列表，并分列显示
-			dbHandle := database.GetMysqlDbHandle()
+			dbHandle := storage.GetMysqlDbHandle()
 			//关键字模糊查找
 			if dbHandle.Find(personageRecordList) == nil {
 				seelog.Errorf("Get personage record list failed from mysql failed")
@@ -137,9 +137,9 @@ func GetRecordList(ctx iris.Context) {
 
 			resBody.Data = personageRecordList
 		case consts.SPORT:
-			sportRecordList := []*database.SportRecordList{}
+			sportRecordList := []*storage.SportRecordList{}
 			//从数据库里获取列表，并分列显示
-			dbHandle := database.GetMysqlDbHandle()
+			dbHandle := storage.GetMysqlDbHandle()
 			//关键字模糊查找
 			if dbHandle.Find(sportRecordList) == nil {
 				seelog.Errorf("Get sport record list failed from mysql failed")
@@ -150,9 +150,9 @@ func GetRecordList(ctx iris.Context) {
 
 			resBody.Data = sportRecordList
 		case consts.ECONOMICS:
-			economicsRecordList := []*database.EconomicsRecordList{}
+			economicsRecordList := []*storage.EconomicsRecordList{}
 			//从数据库里获取列表，并分列显示
-			dbHandle := database.GetMysqlDbHandle()
+			dbHandle := storage.GetMysqlDbHandle()
 			//关键字模糊查找
 			if dbHandle.Find(economicsRecordList) == nil {
 				seelog.Errorf("Get economics record list failed from mysql failed")
@@ -163,9 +163,9 @@ func GetRecordList(ctx iris.Context) {
 
 			resBody.Data = economicsRecordList
 		case consts.MILITARY:
-			militaryRecordList := []*database.MilitaryRecordList{}
+			militaryRecordList := []*storage.MilitaryRecordList{}
 			//从数据库里获取列表，并分列显示
-			dbHandle := database.GetMysqlDbHandle()
+			dbHandle := storage.GetMysqlDbHandle()
 			//关键字模糊查找
 			if dbHandle.Find(militaryRecordList) == nil {
 				seelog.Errorf("Get military record list failed from mysql failed")
@@ -176,9 +176,9 @@ func GetRecordList(ctx iris.Context) {
 
 			resBody.Data = militaryRecordList
 		case consts.ENTERTAINMENT:
-			entertainmentRecordList := []*database.EntertainmentRecordList{}
+			entertainmentRecordList := []*storage.EntertainmentRecordList{}
 			//从数据库里获取列表，并分列显示
-			dbHandle := database.GetMysqlDbHandle()
+			dbHandle := storage.GetMysqlDbHandle()
 			//关键字模糊查找
 			if dbHandle.Find(entertainmentRecordList) == nil {
 				seelog.Errorf("Get entertainment record list failed from mysql failed")
@@ -213,9 +213,9 @@ func GetPersonageRecordList(ctx iris.Context) {
 		return
 	}
 
-	personageRecordList := []*database.PersonageRecordList{}
+	personageRecordList := []*storage.PersonageRecordList{}
 	//从数据库里获取列表，并分列显示
-	dbHandle := database.GetMysqlDbHandle()
+	dbHandle := storage.GetMysqlDbHandle()
 	//关键字模糊查找
 	if dbHandle.Find(personageRecordList) == nil {
 		seelog.Errorf("Get personage record list failed from mysql failed")
@@ -246,9 +246,9 @@ func GetSportRecordList(ctx iris.Context) {
 		return
 	}
 
-	sportRecordList := []*database.SportRecordList{}
+	sportRecordList := []*storage.SportRecordList{}
 	//从数据库里获取列表，并分列显示
-	dbHandle := database.GetMysqlDbHandle()
+	dbHandle := storage.GetMysqlDbHandle()
 	//关键字模糊查找
 	if dbHandle.Find(sportRecordList) == nil {
 		seelog.Errorf("Get sport record list failed from mysql failed")
@@ -277,9 +277,9 @@ func GetEconomicsRecordList(ctx iris.Context) {
 		return
 	}
 
-	economicsRecordList := []*database.EconomicsRecordList{}
+	economicsRecordList := []*storage.EconomicsRecordList{}
 	//从数据库里获取列表，并分列显示
-	dbHandle := database.GetMysqlDbHandle()
+	dbHandle := storage.GetMysqlDbHandle()
 	//关键字模糊查找
 	if dbHandle.Find(economicsRecordList) == nil {
 		seelog.Errorf("Get economics record list failed from mysql failed")
@@ -308,9 +308,9 @@ func GetMilitaryRecordList(ctx iris.Context) {
 		return
 	}
 
-	militaryRecordList := []*database.MilitaryRecordList{}
+	militaryRecordList := []*storage.MilitaryRecordList{}
 	//从数据库里获取列表，并分列显示
-	dbHandle := database.GetMysqlDbHandle()
+	dbHandle := storage.GetMysqlDbHandle()
 	//关键字模糊查找
 	if dbHandle.Find(militaryRecordList) == nil {
 		seelog.Errorf("Get military record list failed from mysql failed")
@@ -339,9 +339,9 @@ func GetEntertainmentRecordList(ctx iris.Context) {
 		return
 	}
 
-	entertainmentRecordList := []*database.EntertainmentRecordList{}
+	entertainmentRecordList := []*storage.EntertainmentRecordList{}
 	//从数据库里获取列表，并分列显示
-	dbHandle := database.GetMysqlDbHandle()
+	dbHandle := storage.GetMysqlDbHandle()
 	//关键字模糊查找
 	if dbHandle.Find(entertainmentRecordList) == nil {
 		seelog.Errorf("Get entertainment record list failed from mysql failed")

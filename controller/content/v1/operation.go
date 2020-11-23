@@ -3,10 +3,12 @@ package v1
 import (
 	"github.com/cihub/seelog"
 	uuid2 "github.com/google/uuid"
-	"github.com/hfeng101/niwo/database"
+	"github.com/hfeng101/niwo/storage"
 	"github.com/hfeng101/niwo/utils/consts"
 	"github.com/kataras/iris/v12"
 	"go.mongodb.org/mongo-driver/bson"
+	"strings"
+	"time"
 )
 
 func GetContent(ctx iris.Context){
@@ -26,13 +28,13 @@ func GetContent(ctx iris.Context){
 	}
 
 	//联合查询，从mysql查询到mongodb的键值，然后去mongodb查内容
-	//record := &database.GenerationRecord{}
-	//dbHandle := database.GetMysqlDbHandle()
+	//record := &storage.GenerationRecord{}
+	//dbHandle := storage.GetMysqlDbHandle()
 	//dbHandle.Where("uuid = ", req.Uuid).Find(record)
 
 	//从mongodb获取对应UUID中的内容
-	content := &database.GenerationRecordContent{}
-	mongoDbHandle := database.GetMongoDbHandle()
+	content := &storage.GenerationRecordContent{}
+	mongoDbHandle := storage.GetMongoDbHandle()
 
 	filter := bson.M{
 		"uuid": req.Uuid,
@@ -78,19 +80,19 @@ func AddContent(ctx iris.Context){
 
 	//先生成uuid
 	uuid := uuid2.New()
-	mysqlDbHandle := database.GetMysqlDbHandle()
+	mysqlDbHandle := storage.GetMysqlDbHandle()
 
 	//生成要写入mongodb的内容
 	data := bson.M{
 		"uuid": uuid,
 		"content": req.Content,
 	}
-	mongoDbHandle := database.GetMongoDbHandle()
+	mongoDbHandle := storage.GetMongoDbHandle()
 	switch req.CatalogType {
 		case consts.PERSONAGE:
 			//先把索引存入mysql
 			count := 0
-			peronageRecord := &database.PersonageRecordList{
+			peronageRecord := &storage.PersonageRecordList{
 				Uuid: uuid.String(),
 				Theme: req.Theme,
 				Keyword: req.Keyword,
@@ -115,7 +117,7 @@ func AddContent(ctx iris.Context){
 		case consts.SPORT:
 			//先把索引存入mysql
 			count := 0
-			sportRecord := &database.SportRecordList{
+			sportRecord := &storage.SportRecordList{
 				Uuid: uuid.String(),
 				Theme: req.Theme,
 				Keyword: req.Keyword,
@@ -140,7 +142,7 @@ func AddContent(ctx iris.Context){
 		case consts.ECONOMICS:
 			//先把索引存入mysql
 			count := 0
-			economicsRecord := &database.SportRecordList{
+			economicsRecord := &storage.SportRecordList{
 				Uuid: uuid.String(),
 				Theme: req.Theme,
 				Keyword: req.Keyword,
@@ -165,7 +167,7 @@ func AddContent(ctx iris.Context){
 		case consts.MILITARY:
 			//先把索引存入mysql
 			count := 0
-			militaryRecord := &database.SportRecordList{
+			militaryRecord := &storage.SportRecordList{
 				Uuid: uuid.String(),
 				Theme: req.Theme,
 				Keyword: req.Keyword,
@@ -190,7 +192,7 @@ func AddContent(ctx iris.Context){
 		case consts.ENTERTAINMENT:
 			//先把索引存入mysql
 			count := 0
-			sportRecord := &database.SportRecordList{
+			sportRecord := &storage.SportRecordList{
 				Uuid: uuid.String(),
 				Theme: req.Theme,
 				Keyword: req.Keyword,
@@ -198,8 +200,8 @@ func AddContent(ctx iris.Context){
 			mysqlDbHandle.FirstOrCreate(sportRecord)
 			//确认落库成功
 			mysqlDbHandle.Where("").Find(sportRecord).Count(&count)
-			//database.MysqlGlobalOrm.FirstOrCreate(kubeConf, `cfg_content = "`+kubeConf.CfgConetent+`"`)
-			//database.MysqlGlobalOrm.Where("cfg_content = ?", kubeConf.CfgConetent).Find(&[]*v1.KubeConfig{}).Count(&count)
+			//storage.MysqlGlobalOrm.FirstOrCreate(kubeConf, `cfg_content = "`+kubeConf.CfgConetent+`"`)
+			//storage.MysqlGlobalOrm.Where("cfg_content = ?", kubeConf.CfgConetent).Find(&[]*v1.KubeConfig{}).Count(&count)
 			if count == 0 {
 				seelog.Errorf("Mysql first create failed!!!")
 				resBody.Code = consts.ERRORCODE
@@ -251,7 +253,7 @@ func UpdateContent(ctx iris.Context){
 		"uuid": req.Uuid,
 		"content": req.Content,
 	}
-	mongoDbHandle := database.GetMongoDbHandle()
+	mongoDbHandle := storage.GetMongoDbHandle()
 	switch req.CatalogType {
 	case consts.PERSONAGE:
 		if _,err := mongoDbHandle.Collection(consts.PERSONAGE).UpdateOne(ctx.Request().Context(), filter, data);err != nil {
@@ -296,3 +298,85 @@ func UpdateContent(ctx iris.Context){
 	}
 }
 
+//图片、视频通过对象存储
+func Upload(ctx iris.Context){
+	resBody := &ResponseContent{
+		Code: consts.SUCCESSCODE,
+		Message: consts.SUCCESSCODEMESSAGE,
+		Data: nil,
+	}
+	req := &UploadReq{}
+
+	defer ctx.JSON(resBody)
+	if err := ctx.ReadJSON(req); err != nil {
+		seelog.Errorf("Input param is valid, err is %v",err.Error())
+		resBody.Code = consts.ERRORCODE
+		resBody.Message = consts.ERRORCODEMESSAGE + err.Error()
+		return
+	}
+
+	file,info,err := ctx.FormFile("uploadfile")
+	if err != nil {
+		seelog.Errorf("Error while uploading, err is %v",err.Error())
+		resBody.Code = consts.ERRORCODE
+		resBody.Message = consts.ERRORCODEMESSAGE + err.Error()
+		return
+	}
+	defer file.Close()
+
+	catalog := ctx.GetHeader("catalog")
+	if catalog == "" {
+		seelog.Errorf("GetHeader catalog failed, catalog header is nil",err.Error())
+		resBody.Code = consts.ERRORCODE
+		resBody.Message = consts.ERRORCODEMESSAGE + "without catalog header"
+		return
+	}
+	//type := ctx.GetHeader("")
+	objectKey, err := generateObjectKey(catalog, info.Filename)
+	if err != nil {
+		seelog.Errorf("generateObjectKey failed, err is %v", err.Error())
+		resBody.Code = consts.ERRORCODE
+		resBody.Message = consts.ERRORCODEMESSAGE + "generateObjectKey failed"
+		return
+	}
+
+	//把数据存放到对象存储中
+	if err := storage.StorageFromIoReader(catalog, objectKey, file); err != nil {
+		seelog.Errorf("storage data failed, err is %v", err.Error())
+		resBody.Code = consts.ERRORCODE
+		resBody.Message = consts.ERRORCODEMESSAGE + "storage data failed"
+		return
+	}
+
+	resBody.Data = objectKey
+}
+
+//生成存储key值，key构成：niwo/分类/timestamp/uuid
+func generateObjectKey(catalog string, fileName string) (string,error){
+	timestamp := time.Now().String()
+	uuid := uuid2.New().String()
+
+	objectKey := catalog+"/"+timestamp+uuid
+
+	//去掉文件名称，去掉用户信息关联的敏感字眼
+	nameSplits := strings.Split(fileName, ".")
+	nameSplitsLength := len(nameSplits)
+	if nameSplitsLength <= 0{
+		seelog.Errorf("nameSplits failed")
+		//return
+	}else {
+		objectKey = objectKey+nameSplits[nameSplitsLength-1]
+	}
+
+	return objectKey,nil
+}
+
+//存放到对象存储
+//func storageToOs(objectKey string, file multipart.File)error {
+//	//OsHandle := storage.GetCosHandle()
+//	//OsHandle
+//	storage.StorageFromIoReader(objectKey, file)
+//	//os.Open()
+//
+//	return nil
+//}
