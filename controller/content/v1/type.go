@@ -35,8 +35,15 @@ type UpdateContentReq struct {
 }
 
 //上传文件、类型、所属分类
-type UploadReq struct{
+type UploadFileReq struct{
 	Name string	`json:"name"`
 	Catalog string `json:"catalog"`
 	Type string `json:"type"`	//类型有file/picture/short-video/long-video/audio
+}
+
+//拉取引用的文件
+type GetReferenceFileReq struct{
+	//Name string	`json:"name"`
+	//Catalog string `json:"catalog"`
+	//Type string `json:"type"`	//类型有file/picture/short-video/long-video/audio
 }

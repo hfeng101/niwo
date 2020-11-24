@@ -17,8 +17,6 @@ Other:
   kube-config-dir : /etc/kube
   key: xsyxxsyxxsyxxsyx
   catalog-concurrency : 1000
-  main-dns-server: 114.114.114.114
-  bak-dns-server: 114.114.114.114
 #  image-repository-domain: harbor.xsts.xyz
   log-path: /var/log/niwo/
   swagger-ip: 172.21.101.228
@@ -26,7 +24,7 @@ Other:
   bucket-size: 50000
 
   # storage mysql -h 127.0.0.1 -P 3306 -ulookup -plookup@2019
-  mysql-dev: lookup:lookup@2019@tcp(127.0.0.1:3306)/niwo?charset=utf8&parseTime=True&loc=Local&timeout=10s&readTimeout=30s&writeTimeout=60s
+  mysql-dev: root:root@tcp(localhost:3306)/niwo?charset=utf8&parseTime=True&loc=Local&timeout=10s&readTimeout=30s&writeTimeout=60s
 #    ip:
 #    port:
 #    user:

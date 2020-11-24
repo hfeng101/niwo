@@ -39,9 +39,7 @@ import (
   "github.com/kataras/iris/v12/middleware/recover"
 )
 
-
 var cfgFile string
-
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -111,26 +109,42 @@ func initConfig() {
 }
 
 func run(cmd *cobra.Command, args []string) {
+  seelog.Infof("starting niwo...")
+
   //init iris config
   config.InitIrisConfig()
 
   //init mysql & create table
-  storage.InitGlobalOrm()
-  db := storage.GetMysqlDbHandle()
-  if db == nil {
+  if err := storage.InitGlobalOrm();err != nil{
+    seelog.Errorf("InitGlobalOrm failed, err is %v", err.Error())
+    return
+  }
+  mysqlHandle := storage.GetMysqlDbHandle()
+  if mysqlHandle == nil {
     seelog.Errorf("GetMysqlDbHandle failed, mysql init failed")
     return
   }
-
-  defer db.Close()
-  if db.AutoMigrate(&storage.UserInfo{}, &storage.ThemeCatalog{},&storage.EconomicsRecordList{},&storage.MilitaryRecordList{},
-   &storage.PersonageRecordList{}, &storage.SportRecordList{}, &storage.EntertainmentRecordList{}) == nil {
-    seelog.Errorf("AutoMigrate failed, mysql init failed")
+  defer mysqlHandle.Close()
+  if mysqlHandle.AutoMigrate(
+      &storage.UserInfo{},
+      &storage.ThemeCatalog{},
+      &storage.EconomicsRecordList{},
+      &storage.MilitaryRecordList{},
+      &storage.PersonageRecordList{},
+      &storage.SportRecordList{},
+      &storage.EntertainmentRecordList{}) == nil {
+    seelog.Errorf("AutoMigrate failed")
     return
   }
 
+  seelog.Infof("InitMongoDb starting!")
   //init mongoDB
-  storage.InitMongoDb()
+  if err := storage.InitMongoDb();err != nil {
+    seelog.Errorf("InitMongoDb failed, err is %v", err.Error())
+    return
+  }
+
+  seelog.Infof("InitMongoDb success!")
 
   //start iris app
   exitChan := make(chan struct{})

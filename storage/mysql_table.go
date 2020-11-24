@@ -100,3 +100,14 @@ type EntertainmentRecordList struct {
 func (*EntertainmentRecordList)TableName() string{
 	return "entertainment_record_list"
 }
+
+//上传文件（普通文件、图片、语音、长视频，短视频)的对象存储元数据(objectKey）记录表
+type OsObjectInfoList struct {
+	gorm.Model
+	Catalog string `json:"colume:catalog;type:varchar(32)"`
+	ObjectKey string `json:"colume:object_key;type:varchar(128)"`
+}
+
+func (*OsObjectInfoList)TableName() string{
+	return "os_object_info_list"
+}

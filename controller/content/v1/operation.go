@@ -11,6 +11,10 @@ import (
 	"time"
 )
 
+var (
+	UploadPrefix = "upload/"
+)
+
 func GetContent(ctx iris.Context){
 	resBody := &ResponseContent{
 		Code: consts.SUCCESSCODE,
@@ -299,13 +303,13 @@ func UpdateContent(ctx iris.Context){
 }
 
 //图片、视频通过对象存储
-func Upload(ctx iris.Context){
+func UploadFile(ctx iris.Context){
 	resBody := &ResponseContent{
 		Code: consts.SUCCESSCODE,
 		Message: consts.SUCCESSCODEMESSAGE,
 		Data: nil,
 	}
-	req := &UploadReq{}
+	req := &UploadFileReq{}
 
 	defer ctx.JSON(resBody)
 	if err := ctx.ReadJSON(req); err != nil {
@@ -348,10 +352,60 @@ func Upload(ctx iris.Context){
 		return
 	}
 
-	resBody.Data = objectKey
+	//返回文件可访问的URL
+	resBody.Data = consts.Host + UploadPrefix + objectKey
 }
 
-//生成存储key值，key构成：niwo/分类/timestamp/uuid
+func GetReferenceFile(ctx iris.Context){
+	resBody := &ResponseContent{
+		Code: consts.SUCCESSCODE,
+		Message: consts.SUCCESSCODEMESSAGE,
+		Data: nil,
+	}
+	req := &GetReferenceFileReq{}
+
+	defer ctx.JSON(resBody)
+	if err := ctx.ReadJSON(req); err != nil {
+		seelog.Errorf("Input param is valid, err is %v",err.Error())
+		resBody.Code = consts.ERRORCODE
+		resBody.Message = consts.ERRORCODEMESSAGE + err.Error()
+		return
+	}
+
+	path := ctx.Path()
+	seelog.Infof("Request path is %v", path)
+
+	pathSplit := strings.Split(path, UploadPrefix)
+	if len(pathSplit) < 2 {
+		seelog.Errorf("Invalid Path")
+		resBody.Code = consts.ERRORCODE
+		resBody.Message = consts.ERRORCODEMESSAGE + "Invalid Path"
+		return
+	}
+	objectKey := pathSplit[len(pathSplit) - 1]
+
+	//获取catalog
+	objectInfo := &storage.OsObjectInfoList{}
+	mysqlHandle := storage.GetMysqlDbHandle()
+	if err := mysqlHandle.Where("object_key=%s", objectKey).First(objectInfo).Error; err != nil {
+		seelog.Errorf("Get objectk info failed, err is %v", err.Error())
+		resBody.Code = consts.ERRORCODE
+		resBody.Message = consts.ERRORCODEMESSAGE + err.Error()
+		return
+	}
+
+	if data,err := storage.GetObjectFromKey(objectInfo.Catalog, objectInfo.ObjectKey);err != nil {
+		seelog.Errorf("GetObjectFromKey failed, err is %v", err)
+		resBody.Code = consts.ERRORCODE
+		resBody.Message = consts.ERRORCODEMESSAGE + err.Error()
+		return
+	}else {
+		resBody.Data = data
+	}
+
+}
+
+//生成存储key值，并保存到数据库，key构成：niwo/分类/timestamp/uuid
 func generateObjectKey(catalog string, fileName string) (string,error){
 	timestamp := time.Now().String()
 	uuid := uuid2.New().String()
@@ -366,6 +420,13 @@ func generateObjectKey(catalog string, fileName string) (string,error){
 		//return
 	}else {
 		objectKey = objectKey+nameSplits[nameSplitsLength-1]
+
+		//写入数据库，记录元数据，供下次拉取
+		mysqlHandle := storage.GetMysqlDbHandle()
+		if err := mysqlHandle.FirstOrCreate(&storage.OsObjectInfoList{ObjectKey: objectKey, Catalog:catalog}).Error;err != nil{
+			seelog.Errorf("push objectkey to mysql failed, err is %v", err.Error())
+			return objectKey, err
+		}
 	}
 
 	return objectKey,nil

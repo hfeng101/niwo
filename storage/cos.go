@@ -21,7 +21,7 @@ var (
 	cosLock = sync.RWMutex{}
 )
 
-//腾讯云是有点烂
+//腾讯云是有点烂，文档烂七八糟
 //func init() {
 //	bucketUrl,err := url.Parse("test123"+"")
 //	if err != nil {
@@ -46,8 +46,9 @@ var (
 //	_,err := CosHandle.Bucket.Put(context.Background(), nil)
 //}
 
-func init() {
-	endpoint := ""
+//阿里云对象存储
+func InitCos() {
+	endpoint := "http://oss-cn-shenzhen.aliyuncs.com"
 
 	CosHandle, err := AliOssSdk.New(endpoint, AliSecretId, AliSecretKey)
 	if err != nil {

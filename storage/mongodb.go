@@ -22,22 +22,22 @@ var (
 	MongoLock = sync.RWMutex{}
 )
 
-func InitMongoDb() {
+func InitMongoDb() error{
 	ctx , cancel :=context.WithTimeout(context.Background(),10*time.Second)
 	//养成良好的习惯，在调用WithTimeout之后defer cancel()
 	defer cancel()
 
-	MongoDbClient, err := mongo.Connect(ctx, options.Client().ApplyURI(config.GetConfig().Other["mongodb-dev"].(string)));
+	var err error
+	MongoDbClient, err = mongo.Connect(ctx, options.Client().ApplyURI(config.GetConfig().Other["mongodb-dev"].(string)));
 	if  err != nil {
-		MongoDbClient = nil
-		MongoDbHandle = nil
-		MongoDbCollectionHandle = nil
 		seelog.Errorf("Connect to mongodb failed, err is %v",err.Error())
-		return
+		return err
 	}
 
+	seelog.Infof("mongo.Connect successed, MongoDbClient is %v", *MongoDbClient)
+
 	//待定
-	MongoDbHandle = MongoDbClient.Database(config.GetConfig().Other["mongo-dev-storage"].(string))
+	MongoDbHandle = MongoDbClient.Database(config.GetConfig().Other["mongo-dev-database"].(string))
 	//MongoDbCollectionHandle = MongoDbHandle.Database(config.GetConfig().Other["mongo-dev-storage"].(string)).Collection(config.GetConfig().Other["mongo-dev-collection"].(string))
 	//MongoDbCollectionHandle = MongoDbClient.Database(config.GetConfig().Other["mongo-dev-storage"].(string)).Collection(config.GetConfig().Other["mongo-dev-collection"].(string))
 	collections := []string{
@@ -47,12 +47,14 @@ func InitMongoDb() {
 		consts.MILITARY,
 		consts.ENTERTAINMENT,
 	}
-
+	seelog.Infof("mongo.Connect successed, MongoDbHandle is %v", *MongoDbHandle)
 
 	if err := CreateMongoCollectionAndIndex(collections);err != nil {
 		seelog.Errorf("CreateMongoIndexes failed, err is %v",err.Error())
-		return
+		return err
 	}
+
+	return nil
 }
 
 func GetMongoDbClient() *mongo.Client{
