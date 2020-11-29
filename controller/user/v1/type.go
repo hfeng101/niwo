@@ -13,6 +13,10 @@ type LoginResponseInfo struct {
 	RefreshToken string `json:"refreshToken"`
 }
 
+type GetVerificationCodeReq struct {
+	PhoneNumber string `json:"phoneNumber"`
+}
+
 type UserRegistrationOrLoginReq struct {
 	//Name string `json:"name"`
 	//Email string `json:"email"`

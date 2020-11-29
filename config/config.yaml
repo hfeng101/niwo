@@ -24,6 +24,7 @@ Other:
   bucket-size: 50000
 
   # storage mysql -h 127.0.0.1 -P 3306 -ulookup -plookup@2019
+  #mysql-dev: root:Root!@#Toor@tcp(120.24.144.110:3306)/niwo?charset=utf8&parseTime=True&loc=Local&timeout=10s&readTimeout=30s&writeTimeout=60s
   mysql-dev: root:root@tcp(localhost:3306)/niwo?charset=utf8&parseTime=True&loc=Local&timeout=10s&readTimeout=30s&writeTimeout=60s
 #    ip:
 #    port:
@@ -38,8 +39,9 @@ Other:
 #    passwd:
 #    storage:
 
-##mongo 127.0.0.1:27107
-  mongodb-dev: mongodb://127.0.0.1:27107
+##mongo 127.0.0.1:27017
+  #mongodb-dev: mongodb://120.24.144.110:27017
+  mongodb-dev: mongodb://127.0.0.1:27017
   mongo-dev-database: niwo
   mongo-dev-collection: demo
   mongodb-pro:

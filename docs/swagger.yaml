@@ -61,7 +61,19 @@ definitions:
     type: object
   v1.GetRecordListReq:
     type: object
+  v1.GetReferenceFileReq:
+    type: object
   v1.GetSportRecordListReq:
+    type: object
+  v1.GetVerificationCodeReq:
+    properties:
+      phoneNumber:
+        type: string
+    type: object
+  v1.LogoutReq:
+    properties:
+      phoneNumber:
+        type: string
     type: object
   v1.UpdateContentReq:
     properties:
@@ -76,15 +88,29 @@ definitions:
       uuid:
         type: string
     type: object
-  v1.UserRegistrationReq:
+  v1.UpdateTokenReq:
     properties:
-      email:
-        type: string
-      name:
-        type: string
-      password:
+      freshToken:
         type: string
       phoneNumber:
+        type: string
+    type: object
+  v1.UserRegistrationOrLoginReq:
+    properties:
+      phoneNumber:
+        description: |-
+          Name string `json:"name"`
+          Email string `json:"email"`
+        type: string
+      verificationCode:
+        description: Password string `json:"password"`
+        type: string
+    type: object
+  v1.VerifyLoginReq:
+    properties:
+      phoneNumber:
+        type: string
+      token:
         type: string
     type: object
 info:
@@ -94,7 +120,7 @@ paths:
     get:
       consumes:
       - application/json
-      description: Get record list of economics record
+      description: 获取"经济"分类的纪录主题列表
       parameters:
       - description: param
         in: body
@@ -115,7 +141,7 @@ paths:
     get:
       consumes:
       - application/json
-      description: Get record list of entertainment record
+      description: 获取"娱乐"分类的纪录主题列表
       parameters:
       - description: param
         in: body
@@ -136,7 +162,7 @@ paths:
     get:
       consumes:
       - application/json
-      description: Get record list by keyword search.
+      description: 获取指定分类的纪录主题列表
       parameters:
       - description: param
         in: body
@@ -157,7 +183,7 @@ paths:
     get:
       consumes:
       - application/json
-      description: Get record list by keyword search.
+      description: 根据搜索获取关键字对应的主题列表
       parameters:
       - description: param
         in: body
@@ -178,7 +204,7 @@ paths:
     get:
       consumes:
       - application/json
-      description: Get record list of military record
+      description: 获取"军事"分类的纪录主题列表
       parameters:
       - description: param
         in: body
@@ -199,7 +225,7 @@ paths:
     get:
       consumes:
       - application/json
-      description: Get record list of personage record
+      description: 获取"人物"分类的纪录主题列表
       parameters:
       - description: param
         in: body
@@ -220,7 +246,7 @@ paths:
     get:
       consumes:
       - application/json
-      description: Get record list of sport record
+      description: 获取"体育"分类的纪录主题列表
       parameters:
       - description: param
         in: body
@@ -237,11 +263,32 @@ paths:
         "50001":
           schema:
             $ref: '#/definitions/github.com_hfeng101_niwo_controller_catalog_v1.ResponseContent'
+  /content/getReferenceFile:
+    get:
+      consumes:
+      - application/json
+      description: 用户获取图片、音、视频文件
+      parameters:
+      - description: param
+        in: body
+        name: Param
+        required: true
+        schema:
+          $ref: '#/definitions/v1.GetReferenceFileReq'
+      produces:
+      - application/json
+      responses:
+        "20000":
+          schema:
+            $ref: '#/definitions/github.com_hfeng101_niwo_controller_content_v1.ResponseContent'
+        "50001":
+          schema:
+            $ref: '#/definitions/github.com_hfeng101_niwo_controller_content_v1.ResponseContent'
   /content/theme:
     get:
       consumes:
       - application/json
-      description: Get content of a record
+      description: 获取指定主题的具体内容
       parameters:
       - description: param
         in: body
@@ -261,7 +308,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: Add content of a record
+      description: 用户创作主题及对应内容
       parameters:
       - description: param
         in: body
@@ -281,7 +328,28 @@ paths:
     put:
       consumes:
       - application/json
-      description: Update content of a record
+      description: 用户编辑更新内容
+      parameters:
+      - description: param
+        in: body
+        name: Param
+        required: true
+        schema:
+          $ref: '#/definitions/v1.UpdateContentReq'
+      produces:
+      - application/json
+      responses:
+        "20000":
+          schema:
+            $ref: '#/definitions/github.com_hfeng101_niwo_controller_content_v1.ResponseContent'
+        "50001":
+          schema:
+            $ref: '#/definitions/github.com_hfeng101_niwo_controller_content_v1.ResponseContent'
+  /content/uploadFile:
+    post:
+      consumes:
+      - application/json
+      description: 用户上传图片、音、视频文件
       parameters:
       - description: param
         in: body
@@ -302,13 +370,77 @@ paths:
     post:
       consumes:
       - application/json
+      description: 获取到验证码后，验证登录
       parameters:
       - description: param
         in: body
         name: param
         required: true
         schema:
-          $ref: '#/definitions/v1.UserRegistrationReq'
+          $ref: '#/definitions/v1.UserRegistrationOrLoginReq'
+      produces:
+      - application/json
+      responses:
+        "20000":
+          schema:
+            $ref: '#/definitions/github.com_hfeng101_niwo_controller_user_v1.ResponseContent'
+        "50001":
+          schema:
+            $ref: '#/definitions/github.com_hfeng101_niwo_controller_user_v1.ResponseContent'
+  /login/getVerificationCode:
+    post:
+      consumes:
+      - application/json
+      description: 用户登录，获取验证码，若是第一次登陆则自动注册
+      parameters:
+      - description: param
+        in: body
+        name: param
+        required: true
+        schema:
+          $ref: '#/definitions/v1.GetVerificationCodeReq'
+      produces:
+      - application/json
+      responses:
+        "20000":
+          schema:
+            $ref: '#/definitions/github.com_hfeng101_niwo_controller_user_v1.ResponseContent'
+        "50001":
+          schema:
+            $ref: '#/definitions/github.com_hfeng101_niwo_controller_user_v1.ResponseContent'
+  /login/updateToken:
+    post:
+      consumes:
+      - application/json
+      description: 用户token过期，重复更新
+      parameters:
+      - description: param
+        in: body
+        name: param
+        required: true
+        schema:
+          $ref: '#/definitions/v1.UpdateTokenReq'
+      produces:
+      - application/json
+      responses:
+        "20000":
+          schema:
+            $ref: '#/definitions/github.com_hfeng101_niwo_controller_user_v1.ResponseContent'
+        "50001":
+          schema:
+            $ref: '#/definitions/github.com_hfeng101_niwo_controller_user_v1.ResponseContent'
+  /login/verifyLogin:
+    post:
+      consumes:
+      - application/json
+      description: 验证用户以前登陆所生成的token来验证登陆
+      parameters:
+      - description: param
+        in: body
+        name: param
+        required: true
+        schema:
+          $ref: '#/definitions/v1.VerifyLoginReq'
       produces:
       - application/json
       responses:
@@ -322,33 +454,14 @@ paths:
     post:
       consumes:
       - application/json
+      description: 用户退出，清除所有登录状态
       parameters:
       - description: param
         in: body
         name: param
         required: true
         schema:
-          $ref: '#/definitions/v1.UserRegistrationReq'
-      produces:
-      - application/json
-      responses:
-        "20000":
-          schema:
-            $ref: '#/definitions/github.com_hfeng101_niwo_controller_user_v1.ResponseContent'
-        "50001":
-          schema:
-            $ref: '#/definitions/github.com_hfeng101_niwo_controller_user_v1.ResponseContent'
-  /user/registration:
-    post:
-      consumes:
-      - application/json
-      parameters:
-      - description: param
-        in: body
-        name: param
-        required: true
-        schema:
-          $ref: '#/definitions/v1.UserRegistrationReq'
+          $ref: '#/definitions/v1.LogoutReq'
       produces:
       - application/json
       responses:

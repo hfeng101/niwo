@@ -5,11 +5,11 @@ import (
 	"github.com/cihub/seelog"
 	"github.com/hfeng101/niwo/utils/config"
 	"github.com/hfeng101/niwo/utils/consts"
-	"go.mongodb.org/mongo-driver/bson"
+
 	"sync"
 	"time"
 
-	//"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -34,9 +34,7 @@ func InitMongoDb() error{
 		return err
 	}
 
-	seelog.Infof("mongo.Connect successed, MongoDbClient is %v", *MongoDbClient)
-
-	//待定
+	//务必保证数据库已经创建
 	MongoDbHandle = MongoDbClient.Database(config.GetConfig().Other["mongo-dev-database"].(string))
 	//MongoDbCollectionHandle = MongoDbHandle.Database(config.GetConfig().Other["mongo-dev-storage"].(string)).Collection(config.GetConfig().Other["mongo-dev-collection"].(string))
 	//MongoDbCollectionHandle = MongoDbClient.Database(config.GetConfig().Other["mongo-dev-storage"].(string)).Collection(config.GetConfig().Other["mongo-dev-collection"].(string))
@@ -47,7 +45,6 @@ func InitMongoDb() error{
 		consts.MILITARY,
 		consts.ENTERTAINMENT,
 	}
-	seelog.Infof("mongo.Connect successed, MongoDbHandle is %v", *MongoDbHandle)
 
 	if err := CreateMongoCollectionAndIndex(collections);err != nil {
 		seelog.Errorf("CreateMongoIndexes failed, err is %v",err.Error())
@@ -76,10 +73,14 @@ func GetMongoDbCollectionHandle() *mongo.Collection{
 }
 
 func CreateMongoCollectionAndIndex(collections []string) error {
+	seelog.Infof("mongo.Connect successed, MongoDbHandle is %v", *MongoDbHandle)
 	for _,collection := range(collections) {
+		//if MongoDbHandle.Collection(collection).
+
 		//创建collection
 		niwoCollection := MongoDbHandle.Collection(collection)
-
+		seelog.Infof("niwoCollection is %v", *niwoCollection)
+		//MongoDbHandle.CreateCollection()
 		expireIn := int32(360000000)
 		_, err := niwoCollection.Indexes().CreateMany(context.Background(), []mongo.IndexModel{
 			{

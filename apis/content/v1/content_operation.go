@@ -7,16 +7,16 @@ import (
 
 // @title Get Content API
 // @version 1.0
-// @contact.name Content operation of theme
-// @contact.url http://www.niwo.com
-// @Description Get content of a record
+// @contact.name content operation
+// @contact.url http://www.niwofly.com
+// @Description 获取指定主题的具体内容
 // @Accept  json
 // @Produce  json
 // @Param Param body ContentController.GetContentReq true "param"
 // @Success 20000 {object} ContentController.ResponseContent	""
 // @Failure 50001 {object} ContentController.ResponseContent	""
 // @Router /content/theme [get]
-// @host niwo.com
+// @host niwofly.com
 // @BasePath /v1
 func GetContent(ctx iris.Context) {
 	ContentController.GetContent(ctx)
@@ -24,16 +24,16 @@ func GetContent(ctx iris.Context) {
 
 // @title Add Content API
 // @version 1.0
-// @contact.name Content operation of theme
-// @contact.url http://www.niwo.com
-// @Description Add content of a record
+// @contact.name content operation
+// @contact.url http://www.niwofly.com
+// @Description 用户创作主题及对应内容
 // @Accept  json
 // @Produce  json
 // @Param Param body ContentController.AddContentReq true "param"
 // @Success 20000 {object} ContentController.ResponseContent	""
 // @Failure 50001 {object} ContentController.ResponseContent	""
 // @Router /content/theme [post]
-// @host niwo.com
+// @host niwofly.com
 // @BasePath /v1
 func AddContent(ctx iris.Context) {
 	ContentController.AddContent(ctx)
@@ -41,17 +41,51 @@ func AddContent(ctx iris.Context) {
 
 // @title Update Content API
 // @version 1.0
-// @contact.name Content operation of theme
-// @contact.url http://www.niwo.com
-// @Description Update content of a record
+// @contact.name content operation
+// @contact.url http://www.niwofly.com
+// @Description 用户编辑更新内容
 // @Accept  json
 // @Produce  json
 // @Param Param body ContentController.UpdateContentReq true "param"
 // @Success 20000 {object} ContentController.ResponseContent	""
 // @Failure 50001 {object} ContentController.ResponseContent	""
 // @Router /content/theme [put]
-// @host niwo.com
+// @host niwofly.com
 // @BasePath /v1
 func UpdateContent(ctx iris.Context) {
 	ContentController.UpdateContent(ctx)
+}
+
+// @title Update Content API
+// @version 1.0
+// @contact.name content operation
+// @contact.url http://www.niwofly.com
+// @Description 用户上传图片、音、视频文件
+// @Accept  json
+// @Produce  json
+// @Param Param body ContentController.UpdateContentReq true "param"
+// @Success 20000 {object} ContentController.ResponseContent	""
+// @Failure 50001 {object} ContentController.ResponseContent	""
+// @Router /content/uploadFile [post]
+// @host niwofly.com
+// @BasePath /v1
+func UploadFile(ctx iris.Context) {
+	ContentController.UploadFile(ctx)
+}
+
+// @title Update Content API
+// @version 1.0
+// @contact.name content operation
+// @contact.url http://www.niwofly.com
+// @Description 用户获取图片、音、视频文件
+// @Accept  json
+// @Produce  json
+// @Param Param body ContentController.GetReferenceFileReq true "param"
+// @Success 20000 {object} ContentController.ResponseContent	""
+// @Failure 50001 {object} ContentController.ResponseContent	""
+// @Router /content/getReferenceFile [get]
+// @host niwofly.com
+// @BasePath /v1
+func GetReferenceFile(ctx iris.Context) {
+	ContentController.GetReferenceFile(ctx)
 }

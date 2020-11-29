@@ -11,7 +11,7 @@ import (
 //swgger文档入口
 func SwaggerRouteRegister(app *iris.Application) {
 	config := &swagger.Config{
-		//or URL is http://localhost:8080/swagger/doc.json
+		//or URL is http://localhost:8080/swagger/index.html
 		URL: "http://localhost:8080/swagger/doc.json", //The url pointing to API definition
 	}
 	// use swagger middleware to

@@ -26,7 +26,7 @@ var doc = `{
     "paths": {
         "/catalog/economicsRecordList": {
             "get": {
-                "description": "Get record list of economics record",
+                "description": "获取\"经济\"分类的纪录主题列表",
                 "consumes": [
                     "application/json"
                 ],
@@ -60,7 +60,7 @@ var doc = `{
         },
         "/catalog/entertainmentRecordList": {
             "get": {
-                "description": "Get record list of entertainment record",
+                "description": "获取\"娱乐\"分类的纪录主题列表",
                 "consumes": [
                     "application/json"
                 ],
@@ -94,7 +94,7 @@ var doc = `{
         },
         "/catalog/list": {
             "get": {
-                "description": "Get record list by keyword search.",
+                "description": "获取指定分类的纪录主题列表",
                 "consumes": [
                     "application/json"
                 ],
@@ -128,7 +128,7 @@ var doc = `{
         },
         "/catalog/listByKey": {
             "get": {
-                "description": "Get record list by keyword search.",
+                "description": "根据搜索获取关键字对应的主题列表",
                 "consumes": [
                     "application/json"
                 ],
@@ -162,7 +162,7 @@ var doc = `{
         },
         "/catalog/militaryRecordList": {
             "get": {
-                "description": "Get record list of military record",
+                "description": "获取\"军事\"分类的纪录主题列表",
                 "consumes": [
                     "application/json"
                 ],
@@ -196,7 +196,7 @@ var doc = `{
         },
         "/catalog/personageRecordList": {
             "get": {
-                "description": "Get record list of personage record",
+                "description": "获取\"人物\"分类的纪录主题列表",
                 "consumes": [
                     "application/json"
                 ],
@@ -230,7 +230,7 @@ var doc = `{
         },
         "/catalog/sportRecordList": {
             "get": {
-                "description": "Get record list of sport record",
+                "description": "获取\"体育\"分类的纪录主题列表",
                 "consumes": [
                     "application/json"
                 ],
@@ -262,9 +262,43 @@ var doc = `{
                 }
             }
         },
+        "/content/getReferenceFile": {
+            "get": {
+                "description": "用户获取图片、音、视频文件",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "description": "param",
+                        "name": "Param",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.GetReferenceFileReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "20000": {
+                        "schema": {
+                            "$ref": "#/definitions/github.com_hfeng101_niwo_controller_content_v1.ResponseContent"
+                        }
+                    },
+                    "50001": {
+                        "schema": {
+                            "$ref": "#/definitions/github.com_hfeng101_niwo_controller_content_v1.ResponseContent"
+                        }
+                    }
+                }
+            }
+        },
         "/content/theme": {
             "get": {
-                "description": "Get content of a record",
+                "description": "获取指定主题的具体内容",
                 "consumes": [
                     "application/json"
                 ],
@@ -296,7 +330,7 @@ var doc = `{
                 }
             },
             "put": {
-                "description": "Update content of a record",
+                "description": "用户编辑更新内容",
                 "consumes": [
                     "application/json"
                 ],
@@ -328,7 +362,7 @@ var doc = `{
                 }
             },
             "post": {
-                "description": "Add content of a record",
+                "description": "用户创作主题及对应内容",
                 "consumes": [
                     "application/json"
                 ],
@@ -360,8 +394,43 @@ var doc = `{
                 }
             }
         },
+        "/content/uploadFile": {
+            "post": {
+                "description": "用户上传图片、音、视频文件",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "description": "param",
+                        "name": "Param",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.UpdateContentReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "20000": {
+                        "schema": {
+                            "$ref": "#/definitions/github.com_hfeng101_niwo_controller_content_v1.ResponseContent"
+                        }
+                    },
+                    "50001": {
+                        "schema": {
+                            "$ref": "#/definitions/github.com_hfeng101_niwo_controller_content_v1.ResponseContent"
+                        }
+                    }
+                }
+            }
+        },
         "/login": {
             "post": {
+                "description": "获取到验证码后，验证登录",
                 "consumes": [
                     "application/json"
                 ],
@@ -375,7 +444,109 @@ var doc = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/v1.UserRegistrationReq"
+                            "$ref": "#/definitions/v1.UserRegistrationOrLoginReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "20000": {
+                        "schema": {
+                            "$ref": "#/definitions/github.com_hfeng101_niwo_controller_user_v1.ResponseContent"
+                        }
+                    },
+                    "50001": {
+                        "schema": {
+                            "$ref": "#/definitions/github.com_hfeng101_niwo_controller_user_v1.ResponseContent"
+                        }
+                    }
+                }
+            }
+        },
+        "/login/getVerificationCode": {
+            "post": {
+                "description": "用户登录，获取验证码，若是第一次登陆则自动注册",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "description": "param",
+                        "name": "param",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.GetVerificationCodeReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "20000": {
+                        "schema": {
+                            "$ref": "#/definitions/github.com_hfeng101_niwo_controller_user_v1.ResponseContent"
+                        }
+                    },
+                    "50001": {
+                        "schema": {
+                            "$ref": "#/definitions/github.com_hfeng101_niwo_controller_user_v1.ResponseContent"
+                        }
+                    }
+                }
+            }
+        },
+        "/login/updateToken": {
+            "post": {
+                "description": "用户token过期，重复更新",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "description": "param",
+                        "name": "param",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.UpdateTokenReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "20000": {
+                        "schema": {
+                            "$ref": "#/definitions/github.com_hfeng101_niwo_controller_user_v1.ResponseContent"
+                        }
+                    },
+                    "50001": {
+                        "schema": {
+                            "$ref": "#/definitions/github.com_hfeng101_niwo_controller_user_v1.ResponseContent"
+                        }
+                    }
+                }
+            }
+        },
+        "/login/verifyLogin": {
+            "post": {
+                "description": "验证用户以前登陆所生成的token来验证登陆",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "description": "param",
+                        "name": "param",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.VerifyLoginReq"
                         }
                     }
                 ],
@@ -395,6 +566,7 @@ var doc = `{
         },
         "/logout": {
             "post": {
+                "description": "用户退出，清除所有登录状态",
                 "consumes": [
                     "application/json"
                 ],
@@ -408,40 +580,7 @@ var doc = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/v1.UserRegistrationReq"
-                        }
-                    }
-                ],
-                "responses": {
-                    "20000": {
-                        "schema": {
-                            "$ref": "#/definitions/github.com_hfeng101_niwo_controller_user_v1.ResponseContent"
-                        }
-                    },
-                    "50001": {
-                        "schema": {
-                            "$ref": "#/definitions/github.com_hfeng101_niwo_controller_user_v1.ResponseContent"
-                        }
-                    }
-                }
-            }
-        },
-        "/user/registration": {
-            "post": {
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "parameters": [
-                    {
-                        "description": "param",
-                        "name": "param",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/v1.UserRegistrationReq"
+                            "$ref": "#/definitions/v1.LogoutReq"
                         }
                     }
                 ],
@@ -557,8 +696,27 @@ var doc = `{
         "v1.GetRecordListReq": {
             "type": "object"
         },
+        "v1.GetReferenceFileReq": {
+            "type": "object"
+        },
         "v1.GetSportRecordListReq": {
             "type": "object"
+        },
+        "v1.GetVerificationCodeReq": {
+            "type": "object",
+            "properties": {
+                "phoneNumber": {
+                    "type": "string"
+                }
+            }
+        },
+        "v1.LogoutReq": {
+            "type": "object",
+            "properties": {
+                "phoneNumber": {
+                    "type": "string"
+                }
+            }
         },
         "v1.UpdateContentReq": {
             "type": "object",
@@ -580,19 +738,37 @@ var doc = `{
                 }
             }
         },
-        "v1.UserRegistrationReq": {
+        "v1.UpdateTokenReq": {
             "type": "object",
             "properties": {
-                "email": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "password": {
+                "freshToken": {
                     "type": "string"
                 },
                 "phoneNumber": {
+                    "type": "string"
+                }
+            }
+        },
+        "v1.UserRegistrationOrLoginReq": {
+            "type": "object",
+            "properties": {
+                "phoneNumber": {
+                    "description": "Name string ` + "`" + `json:\"name\"` + "`" + `\nEmail string ` + "`" + `json:\"email\"` + "`" + `",
+                    "type": "string"
+                },
+                "verificationCode": {
+                    "description": "Password string ` + "`" + `json:\"password\"` + "`" + `",
+                    "type": "string"
+                }
+            }
+        },
+        "v1.VerifyLoginReq": {
+            "type": "object",
+            "properties": {
+                "phoneNumber": {
+                    "type": "string"
+                },
+                "token": {
                     "type": "string"
                 }
             }

@@ -28,7 +28,7 @@ func GetVerificationCode(ctx iris.Context) {
 		Code: consts.SUCCESSCODE,
 		Message: consts.SUCCESSCODEMESSAGE,
 	}
-	req := &UserRegistrationOrLoginReq{}
+	req := &GetVerificationCodeReq{}
 
 	defer ctx.JSON(rsp)
 	if err := ctx.ReadJSON(req); err != nil {
@@ -50,6 +50,8 @@ func GetVerificationCode(ctx iris.Context) {
 			rsp.Message = consts.ERRORCODEMESSAGE + err.Error()
 			return
 		}
+
+		rsp.Data = verificationCode
 	}
 
 }
@@ -187,10 +189,6 @@ func Logout(ctx iris.Context) {
 		rsp.Message = consts.ERRORCODEMESSAGE
 		return
 	}
-}
-
-func Registration(ctx iris.Context) {
-
 }
 
 //生成验证码，若用户不存在，则同时生成用户信息，并写入到用户表

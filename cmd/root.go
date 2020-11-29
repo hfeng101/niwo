@@ -143,8 +143,24 @@ func run(cmd *cobra.Command, args []string) {
     seelog.Errorf("InitMongoDb failed, err is %v", err.Error())
     return
   }
-
+  mongodbHandle := storage.GetMongoDbClient()
+  if mongodbHandle == nil {
+    seelog.Errorf("GetMysqlDbHandle failed, mysql init failed")
+    return
+  }
+  defer mongodbHandle.Disconnect(context.TODO())
   seelog.Infof("InitMongoDb success!")
+
+  if err := storage.InitCos();err != nil {
+    seelog.Errorf("InitCos failed, err is %v", err.Error())
+    return
+  }
+  cosHandle := storage.GetCosHandle()
+  if cosHandle == nil {
+    seelog.Errorf("cosHandle failed, mysql init failed")
+    return
+  }
+  defer storage.DestroyCosHandle()
 
   //start iris app
   exitChan := make(chan struct{})

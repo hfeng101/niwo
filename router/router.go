@@ -3,6 +3,7 @@ package Router
 import (
 	"github.com/kataras/iris/v12"
 	"github.com/hfeng101/niwo/router/register"
+	//_ "github.com/hfeng101/niwo/docs"
 )
 
 type Routing struct {

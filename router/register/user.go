@@ -7,10 +7,19 @@ import (
 
 //用户信息设置，含登陆、退出
 func LoginRouteRegister(app *iris.Application) {
-	loginParty := app.Party("/login")
+	loginParty := app.Party("/v1/login")
 
-	//默认用户名、密码登陆
+	//获取验证码
+	loginParty.Post("/getVerificationCode", v1.GetVerificationCode)
+
+	//验证码登陆
 	loginParty.Post("/", v1.Login)
+
+	//通过token登陆
+	loginParty.Post("/verifyLogin", v1.VerifyLogin)
+
+	//更新验证码
+	loginParty.Post("/updateToken", v1.UpdateToken)
 
 	//手机登陆
 	//loginParty.Post("/phone",)
@@ -20,22 +29,21 @@ func LoginRouteRegister(app *iris.Application) {
 }
 
 func LogoutRouteRegister(app *iris.Application) {
-	logoutParty := app.Party("/logout")
+	logoutParty := app.Party("/v1/logout")
 
 	logoutParty.Post("/", v1.Logout)
 }
 
 func UserRouteRegister(app *iris.Application) {
-	userParty := app.Party("/user")
+	//userParty := app.Party("/user")
 
-	userParty.Post("/registration", v1.Registration)
-	userParty.Get("/info",)
-
-	//修改密码
-	userParty.Put("/password",)
-
-	//添加、修改用户信息
-	userParty.Post("/info", )
-	userParty.Put("/info", )
+	//userParty.Get("/info",)
+	//
+	////修改密码
+	//userParty.Put("/password",)
+	//
+	////添加、修改用户信息
+	//userParty.Post("/info", )
+	//userParty.Put("/info", )
 
 }

@@ -15,8 +15,8 @@ var (
 
 	CosHandle *AliOssSdk.Client
 	CosBucketHandle *AliOssSdk.Bucket
-	AliSecretId string
-	AliSecretKey string
+	AliSecretId = "LTAI4G8vW2yz1i71mDBS53hg"
+	AliSecretKey = "rsiXMWlolkYZ3d5u3bZU5PJIFtV8Os"
 
 	cosLock = sync.RWMutex{}
 )
@@ -47,50 +47,64 @@ var (
 //}
 
 //阿里云对象存储
-func InitCos() {
+func InitCos() error {
+//func init() {
+	var err error
 	endpoint := "http://oss-cn-shenzhen.aliyuncs.com"
 
-	CosHandle, err := AliOssSdk.New(endpoint, AliSecretId, AliSecretKey)
+	CosHandle, err = AliOssSdk.New(endpoint, AliSecretId, AliSecretKey)
 	if err != nil {
 		seelog.Errorf("AliOssSdk.New failed, err is %v", err.Error())
-		return
+		return err
 	}
 
-	//为每一个分类创建一个桶
-	if err := CosHandle.CreateBucket(consts.PERSONAGE);err != nil {
-		seelog.Errorf("create bucket %v failed, err is %v", consts.PERSONAGE, err.Error())
-		return
+	//首次为每一个分类创建一个桶，为避免云上bucket冲突，每个bucket添加带"niwo"的前缀
+	prefix := "niwo"
+	if _,err := CosHandle.GetBucketStat(prefix + consts.PERSONAGE);err != nil {
+		if err := CosHandle.CreateBucket(prefix + consts.PERSONAGE);err != nil {
+			seelog.Errorf("create bucket %v failed, err is %v", consts.PERSONAGE, err.Error())
+			return err
+		}
 	}
 
-	if err := CosHandle.CreateBucket(consts.SPORT);err != nil {
-		seelog.Errorf("create bucket %v failed, err is %v", consts.SPORT, err.Error())
-		return
+	if _,err := CosHandle.GetBucketStat(prefix + consts.SPORT);err != nil {
+		if err := CosHandle.CreateBucket(prefix + consts.SPORT); err != nil {
+			seelog.Errorf("create bucket %v failed, err is %v", consts.SPORT, err.Error())
+			return err
+		}
 	}
 
-	if err := CosHandle.CreateBucket(consts.SPORT);err != nil {
-		seelog.Errorf("create bucket %v failed, err is %v", consts.SPORT, err.Error())
-		return
+	if _,err := CosHandle.GetBucketStat(prefix + consts.ECONOMICS);err != nil {
+		if err := CosHandle.CreateBucket(prefix + consts.ECONOMICS); err != nil {
+			seelog.Errorf("create bucket %v failed, err is %v", consts.SPORT, err.Error())
+			return err
+		}
 	}
 
-	if err := CosHandle.CreateBucket(consts.ECONOMICS);err != nil {
-		seelog.Errorf("create bucket %v failed, err is %v", consts.SPORT, err.Error())
-		return
+	if _,err := CosHandle.GetBucketStat(prefix + consts.MILITARY);err != nil {
+		if err := CosHandle.CreateBucket(prefix + consts.MILITARY); err != nil {
+			seelog.Errorf("create bucket %v failed, err is %v", consts.SPORT, err.Error())
+			return err
+		}
 	}
 
-	if err := CosHandle.CreateBucket(consts.MILITARY);err != nil {
-		seelog.Errorf("create bucket %v failed, err is %v", consts.SPORT, err.Error())
-		return
+	if _,err := CosHandle.GetBucketStat(prefix + consts.ENTERTAINMENT);err != nil {
+		if err := CosHandle.CreateBucket(prefix + consts.ENTERTAINMENT); err != nil {
+			seelog.Errorf("create bucket %v failed, err is %v", consts.SPORT, err.Error())
+			return err
+		}
 	}
 
-	if err := CosHandle.CreateBucket(consts.ENTERTAINMENT);err != nil {
-		seelog.Errorf("create bucket %v failed, err is %v", consts.SPORT, err.Error())
-		return
-	}
+	return nil
 }
 
-func GetCosHandle() interface{}{
+func GetCosHandle() *AliOssSdk.Client{
 	cosLock.RLock()
 	defer cosLock.RUnlock()
 
 	return CosHandle
+}
+
+func DestroyCosHandle() {
+
 }
