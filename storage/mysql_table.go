@@ -14,10 +14,82 @@ type UserInfo struct {
 	Token string `gorm:"column:token;type:varchar(64)"`
 	RefreshToken string `gorm:"column:refresh_token;type:varchar(64)"`
 	Secret string `gorm:"column:secret;type:varchar(8)"`
+	HeadImage string `gorm:"column:head_image;type:varchar(256)"`
 }
 
 func (*UserInfo)TableName() string{
 	return "user_info"
+}
+
+//用户视图，收藏、浏览记录、粉丝、关注、话题数据
+type UserView struct {
+	gorm.Model
+	PhoneNumber string `gorm:"column:phone_number;type:varchar(16)"`
+	Name string `gorm:"column:name;type:varchar(128)"`
+	CollectionNumber string `gorm:"column:collection_number;type:int"`
+	HistoryNumber string `gorm:"column:history_number;type:int"`
+	FansNumber string `gorm:"column:fans_number;type:int"`
+	FollowNumber string `gorm:"column:follow_number;type:int"`
+	TopicNumber string `gorm:"column:topic_number;type:int"`
+}
+
+func (*UserView)TableName() string{
+	return "user_view"
+}
+
+//收藏列表
+type CollectionList struct {
+	gorm.Model
+	PhoneNumber string `gorm:"column:phone_number;type:varchar(16)"`
+	Name string `gorm:"column:name;type:varchar(128)"`
+}
+
+func (*CollectionList)TableName() string{
+	return "collection_list"
+}
+
+//浏览记录列表
+type HistoryList struct {
+	gorm.Model
+	PhoneNumber string `gorm:"column:phone_number;type:varchar(16)"`
+	Name string `gorm:"column:name;type:varchar(128)"`
+}
+
+func (*HistoryList)TableName() string{
+	return "history_list"
+}
+
+//关注列表
+type FollowList struct {
+	gorm.Model
+	PhoneNumber string `gorm:"column:phone_number;type:varchar(16)"`
+	Name string `gorm:"column:name;type:varchar(128)"`
+}
+
+func (*FollowList)TableName() string{
+	return "follow_list"
+}
+
+//粉丝列表
+type FansList struct {
+	gorm.Model
+	PhoneNumber string `gorm:"column:phone_number;type:varchar(16)"`
+	Name string `gorm:"column:name;type:varchar(128)"`
+}
+
+func (*FansList)TableName() string{
+	return "fans_list"
+}
+
+//话题列表
+type TopicList struct {
+	gorm.Model
+	PhoneNumber string `gorm:"column:phone_number;type:varchar(16)"`
+	Name string `gorm:"column:name;type:varchar(128)"`
+}
+
+func (*TopicList)TableName() string{
+	return "topic_list"
 }
 
 //主题分类

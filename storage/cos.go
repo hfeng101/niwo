@@ -15,8 +15,8 @@ var (
 
 	CosHandle *AliOssSdk.Client
 	CosBucketHandle *AliOssSdk.Bucket
-	AliSecretId = "LTAI4G8vW2yz1i71mDBS53hg"
-	AliSecretKey = "rsiXMWlolkYZ3d5u3bZU5PJIFtV8Os"
+	//AliSecretId = "LTAI4G8vW2yz1i71mDBS53hg"
+	//AliSecretKey = "rsiXMWlolkYZ3d5u3bZU5PJIFtV8Os"
 
 	cosLock = sync.RWMutex{}
 )
@@ -52,7 +52,7 @@ func InitCos() error {
 	var err error
 	endpoint := "http://oss-cn-shenzhen.aliyuncs.com"
 
-	CosHandle, err = AliOssSdk.New(endpoint, AliSecretId, AliSecretKey)
+	CosHandle, err = AliOssSdk.New(endpoint, consts.AliSecretId, consts.AliSecretKey)
 	if err != nil {
 		seelog.Errorf("AliOssSdk.New failed, err is %v", err.Error())
 		return err

@@ -6,15 +6,19 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	uuid2 "github.com/google/uuid"
 	"github.com/hfeng101/niwo/storage"
+	"github.com/hfeng101/niwo/utils/cloud"
 	"github.com/hfeng101/niwo/utils/consts"
 	"github.com/kataras/iris/v12"
 	"math/rand"
 	"strconv"
 	"time"
+
+	"github.com/aliyun/alibaba-cloud-sdk-go/services/dysmsapi"
 )
 
 var (
 	ExpireTime = 3600000	//token有效期
+	SignName = "你我"
 )
 
 type JwtClaims struct {
@@ -38,13 +42,13 @@ func GetVerificationCode(ctx iris.Context) {
 		return
 	}
 
-	if verificationCode,err := generateVerificationCode(req.PhoneNumber); err != nil{
+	if verificationCode,err := generateAndStoreVerificationCode(req.PhoneNumber); err != nil{
 		seelog.Errorf("generateVerificationCode failed,err is %v", err.Error())
 		rsp.Code = consts.ERRORCODE
 		rsp.Message = consts.ERRORCODEMESSAGE + err.Error()
 		return
 	}else {
-		if err := pushVerificationCode(verificationCode); err != nil{
+		if err := pushVerificationCode(verificationCode, req.PhoneNumber); err != nil{
 			seelog.Errorf("pushVerificationCode failed,err is %v", err.Error())
 			rsp.Code = consts.ERRORCODE
 			rsp.Message = consts.ERRORCODEMESSAGE + err.Error()
@@ -191,8 +195,8 @@ func Logout(ctx iris.Context) {
 	}
 }
 
-//生成验证码，若用户不存在，则同时生成用户信息，并写入到用户表
-func generateVerificationCode(phoneNumber string) (string,error){
+//生成短信验证码，若用户不存在，则同时生成用户信息，并写入到用户表
+func generateAndStoreVerificationCode(phoneNumber string) (string,error){
 	//生成6位随机校验码
 	verificationCode := ""
 	for i := 0; i<6; i++ {
@@ -248,7 +252,23 @@ func storeVerificationCode(phoneNumber string, verificationCode string) error{
 }
 
 //通过短信的方式推送验证码，调用第三方sdk
-func pushVerificationCode(verificationCode string) error{
+func pushVerificationCode(verificationCode string, phoneNumber string) error{
+	//shortMessage := "【你我】您的登陆验证码"+verificationCode+"，欢迎使用你我app"
+
+	dysmsapiHandle := cloud.GetDysmsapiHandle()
+	request := dysmsapi.CreateSendSmsRequest()
+	request.Scheme = "https"
+	request.TemplateCode = verificationCode
+	request.PhoneNumbers = phoneNumber
+	request.SignName = SignName
+
+	response,err := dysmsapiHandle.SendSms(request)
+	if err != nil {
+		seelog.Errorf("SendSms failed, err is %v", err.Error())
+		return err
+	}
+
+	seelog.Infof("SendSms response is %v", response)
 
 	return nil
 }
