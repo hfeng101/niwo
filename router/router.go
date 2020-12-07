@@ -15,6 +15,11 @@ func RegistryRoutes(app *iris.Application){
 	register.LogoutRouteRegister(app)
 
 	register.UserRouteRegister(app)
+	register.CatalogRouteRegister(app)
+	register.ContentRouteRegister(app)
+
+	register.GroupRouteRegister(app)
+	register.ReferenceRouteRegister(app)
 
 	register.SwaggerRouteRegister(app)
 }

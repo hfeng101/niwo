@@ -20,7 +20,8 @@ import (
   "fmt"
   "github.com/cihub/seelog"
   "github.com/hfeng101/niwo/storage"
-  "github.com/hfeng101/niwo/utils/config"
+	"github.com/hfeng101/niwo/storage/mysql"
+	"github.com/hfeng101/niwo/utils/config"
   "github.com/hfeng101/niwo/utils/logger"
   "github.com/spf13/cobra"
   "os"
@@ -115,24 +116,24 @@ func run(cmd *cobra.Command, args []string) {
   config.InitIrisConfig()
 
   //init mysql & create table
-  if err := storage.InitGlobalOrm();err != nil{
+  if err := mysql.InitGlobalOrm();err != nil{
     seelog.Errorf("InitGlobalOrm failed, err is %v", err.Error())
     return
   }
-  mysqlHandle := storage.GetMysqlDbHandle()
+  mysqlHandle := mysql.GetMysqlDbHandle()
   if mysqlHandle == nil {
     seelog.Errorf("GetMysqlDbHandle failed, mysql init failed")
     return
   }
   defer mysqlHandle.Close()
   if mysqlHandle.AutoMigrate(
-      &storage.UserInfo{},
-      &storage.ThemeCatalog{},
-      &storage.EconomicsRecordList{},
-      &storage.MilitaryRecordList{},
-      &storage.PersonageRecordList{},
-      &storage.SportRecordList{},
-      &storage.EntertainmentRecordList{}) == nil {
+      &mysql.UserInfo{},
+      &mysql.ThemeCatalog{},
+      &mysql.EconomicsRecordList{},
+      &mysql.MilitaryRecordList{},
+      &mysql.PersonageRecordList{},
+      &mysql.SportRecordList{},
+      &mysql.EntertainmentRecordList{}) == nil {
     seelog.Errorf("AutoMigrate failed")
     return
   }
@@ -224,7 +225,7 @@ func reloadConfiguration(ctx context.Context) {
           }
 
           //reload mysql
-          storage.InitGlobalOrm()
+          mysql.InitGlobalOrm()
 
           //reload mongodb
           storage.InitMongoDb()

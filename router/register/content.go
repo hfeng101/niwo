@@ -1,6 +1,7 @@
 package register
 
 import (
+	"github.com/cihub/seelog"
 	"github.com/kataras/iris/v12"
 	"github.com/hfeng101/niwo/apis/content/v1"
 )
@@ -9,6 +10,7 @@ import (
 func ContentRouteRegister(app *iris.Application) {
 	contentParty := app.Party("/v1/content")
 
+	seelog.Infof("ContentRouteRegister starting")
 	//获取主题对应的内容
 	contentParty.Get("/theme",v1.GetContent)
 

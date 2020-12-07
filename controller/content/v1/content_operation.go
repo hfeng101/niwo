@@ -4,6 +4,7 @@ import (
 	"github.com/cihub/seelog"
 	uuid2 "github.com/google/uuid"
 	"github.com/hfeng101/niwo/storage"
+	"github.com/hfeng101/niwo/storage/mysql"
 	"github.com/hfeng101/niwo/utils/consts"
 	"github.com/kataras/iris/v12"
 	"go.mongodb.org/mongo-driver/bson"
@@ -84,7 +85,7 @@ func AddContent(ctx iris.Context){
 
 	//先生成uuid
 	uuid := uuid2.New()
-	mysqlDbHandle := storage.GetMysqlDbHandle()
+	mysqlDbHandle := mysql.GetMysqlDbHandle()
 
 	//生成要写入mongodb的内容
 	data := bson.M{
@@ -96,7 +97,7 @@ func AddContent(ctx iris.Context){
 		case consts.PERSONAGE:
 			//先把索引存入mysql
 			count := 0
-			peronageRecord := &storage.PersonageRecordList{
+			peronageRecord := &mysql.PersonageRecordList{
 				Uuid: uuid.String(),
 				Theme: req.Theme,
 				Keyword: req.Keyword,
@@ -121,7 +122,7 @@ func AddContent(ctx iris.Context){
 		case consts.SPORT:
 			//先把索引存入mysql
 			count := 0
-			sportRecord := &storage.SportRecordList{
+			sportRecord := &mysql.SportRecordList{
 				Uuid: uuid.String(),
 				Theme: req.Theme,
 				Keyword: req.Keyword,
@@ -146,7 +147,7 @@ func AddContent(ctx iris.Context){
 		case consts.ECONOMICS:
 			//先把索引存入mysql
 			count := 0
-			economicsRecord := &storage.SportRecordList{
+			economicsRecord := &mysql.SportRecordList{
 				Uuid: uuid.String(),
 				Theme: req.Theme,
 				Keyword: req.Keyword,
@@ -171,7 +172,7 @@ func AddContent(ctx iris.Context){
 		case consts.MILITARY:
 			//先把索引存入mysql
 			count := 0
-			militaryRecord := &storage.SportRecordList{
+			militaryRecord := &mysql.SportRecordList{
 				Uuid: uuid.String(),
 				Theme: req.Theme,
 				Keyword: req.Keyword,
@@ -196,7 +197,7 @@ func AddContent(ctx iris.Context){
 		case consts.ENTERTAINMENT:
 			//先把索引存入mysql
 			count := 0
-			sportRecord := &storage.SportRecordList{
+			sportRecord := &mysql.SportRecordList{
 				Uuid: uuid.String(),
 				Theme: req.Theme,
 				Keyword: req.Keyword,
@@ -228,8 +229,6 @@ func AddContent(ctx iris.Context){
 	}
 
 	//mongoDbHandle.Collection()
-
-
 }
 
 func UpdateContent(ctx iris.Context){
@@ -253,13 +252,18 @@ func UpdateContent(ctx iris.Context){
 		"uuid": req.Uuid,
 	}
 
-	data := bson.M{
-		"uuid": req.Uuid,
-		"content": req.Content,
+	data := bson.M{"$set":
+		bson.M {
+			"uuid": req.Uuid,
+			"content": req.Content,
+		},
 	}
+
+	seelog.Errorf("filter is %v, \n data is %v", filter, data)
 	mongoDbHandle := storage.GetMongoDbHandle()
 	switch req.CatalogType {
 	case consts.PERSONAGE:
+		seelog.Errorf("filter 11111 is %v, \n data 11111 is %v", filter, data)
 		if _,err := mongoDbHandle.Collection(consts.PERSONAGE).UpdateOne(ctx.Request().Context(), filter, data);err != nil {
 			seelog.Errorf("Update content to collection %v failed, err is %v!!!", consts.PERSONAGE, err.Error())
 			resBody.Code = consts.ERRORCODE
@@ -385,8 +389,8 @@ func GetReferenceFile(ctx iris.Context){
 	objectKey := pathSplit[len(pathSplit) - 1]
 
 	//获取catalog
-	objectInfo := &storage.OsObjectInfoList{}
-	mysqlHandle := storage.GetMysqlDbHandle()
+	objectInfo := &mysql.OsObjectInfoList{}
+	mysqlHandle := mysql.GetMysqlDbHandle()
 	if err := mysqlHandle.Where("object_key=%s", objectKey).First(objectInfo).Error; err != nil {
 		seelog.Errorf("Get objectk info failed, err is %v", err.Error())
 		resBody.Code = consts.ERRORCODE
@@ -422,8 +426,8 @@ func generateObjectKey(catalog string, fileName string) (string,error){
 		objectKey = objectKey+nameSplits[nameSplitsLength-1]
 
 		//写入数据库，记录元数据，供下次拉取
-		mysqlHandle := storage.GetMysqlDbHandle()
-		if err := mysqlHandle.FirstOrCreate(&storage.OsObjectInfoList{ObjectKey: objectKey, Catalog:catalog}).Error;err != nil{
+		mysqlHandle := mysql.GetMysqlDbHandle()
+		if err := mysqlHandle.FirstOrCreate(&mysql.OsObjectInfoList{ObjectKey: objectKey, Catalog:catalog}).Error;err != nil{
 			seelog.Errorf("push objectkey to mysql failed, err is %v", err.Error())
 			return objectKey, err
 		}

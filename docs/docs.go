@@ -24,7 +24,7 @@ var doc = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/catalog/economicsRecordList": {
+        "/v1/catalog/economicsRecordList": {
             "get": {
                 "description": "获取\"经济\"分类的纪录主题列表",
                 "consumes": [
@@ -33,17 +33,6 @@ var doc = `{
                 "produces": [
                     "application/json"
                 ],
-                "parameters": [
-                    {
-                        "description": "param",
-                        "name": "param",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/v1.GetEconomicsRecordListReq"
-                        }
-                    }
-                ],
                 "responses": {
                     "20000": {
                         "schema": {
@@ -58,7 +47,7 @@ var doc = `{
                 }
             }
         },
-        "/catalog/entertainmentRecordList": {
+        "/v1/catalog/entertainmentRecordList": {
             "get": {
                 "description": "获取\"娱乐\"分类的纪录主题列表",
                 "consumes": [
@@ -67,17 +56,6 @@ var doc = `{
                 "produces": [
                     "application/json"
                 ],
-                "parameters": [
-                    {
-                        "description": "param",
-                        "name": "param",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/v1.GetEntertainmentRecordListReq"
-                        }
-                    }
-                ],
                 "responses": {
                     "20000": {
                         "schema": {
@@ -92,7 +70,7 @@ var doc = `{
                 }
             }
         },
-        "/catalog/list": {
+        "/v1/catalog/list": {
             "get": {
                 "description": "获取指定分类的纪录主题列表",
                 "consumes": [
@@ -103,13 +81,11 @@ var doc = `{
                 ],
                 "parameters": [
                     {
+                        "type": "string",
                         "description": "param",
-                        "name": "param",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/v1.GetRecordListReq"
-                        }
+                        "name": "catalog",
+                        "in": "query",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -126,8 +102,8 @@ var doc = `{
                 }
             }
         },
-        "/catalog/listByKey": {
-            "get": {
+        "/v1/catalog/listByKey": {
+            "post": {
                 "description": "根据搜索获取关键字对应的主题列表",
                 "consumes": [
                     "application/json"
@@ -160,7 +136,7 @@ var doc = `{
                 }
             }
         },
-        "/catalog/militaryRecordList": {
+        "/v1/catalog/militaryRecordList": {
             "get": {
                 "description": "获取\"军事\"分类的纪录主题列表",
                 "consumes": [
@@ -169,17 +145,6 @@ var doc = `{
                 "produces": [
                     "application/json"
                 ],
-                "parameters": [
-                    {
-                        "description": "param",
-                        "name": "param",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/v1.GetMilitaryRecordListReq"
-                        }
-                    }
-                ],
                 "responses": {
                     "20000": {
                         "schema": {
@@ -194,7 +159,7 @@ var doc = `{
                 }
             }
         },
-        "/catalog/personageRecordList": {
+        "/v1/catalog/personageRecordList": {
             "get": {
                 "description": "获取\"人物\"分类的纪录主题列表",
                 "consumes": [
@@ -203,17 +168,6 @@ var doc = `{
                 "produces": [
                     "application/json"
                 ],
-                "parameters": [
-                    {
-                        "description": "param",
-                        "name": "param",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/v1.GetPersonageRecordListReq"
-                        }
-                    }
-                ],
                 "responses": {
                     "20000": {
                         "schema": {
@@ -228,7 +182,7 @@ var doc = `{
                 }
             }
         },
-        "/catalog/sportRecordList": {
+        "/v1/catalog/sportRecordList": {
             "get": {
                 "description": "获取\"体育\"分类的纪录主题列表",
                 "consumes": [
@@ -237,17 +191,6 @@ var doc = `{
                 "produces": [
                     "application/json"
                 ],
-                "parameters": [
-                    {
-                        "description": "param",
-                        "name": "param",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/v1.GetSportRecordListReq"
-                        }
-                    }
-                ],
                 "responses": {
                     "20000": {
                         "schema": {
@@ -262,7 +205,7 @@ var doc = `{
                 }
             }
         },
-        "/content/getReferenceFile": {
+        "/v1/content/getReferenceFile": {
             "get": {
                 "description": "用户获取图片、音、视频文件",
                 "consumes": [
@@ -296,7 +239,7 @@ var doc = `{
                 }
             }
         },
-        "/content/theme": {
+        "/v1/content/theme": {
             "get": {
                 "description": "获取指定主题的具体内容",
                 "consumes": [
@@ -394,7 +337,7 @@ var doc = `{
                 }
             }
         },
-        "/content/uploadFile": {
+        "/v1/content/uploadFile": {
             "post": {
                 "description": "用户上传图片、音、视频文件",
                 "consumes": [
@@ -428,9 +371,9 @@ var doc = `{
                 }
             }
         },
-        "/login": {
+        "/v1/login": {
             "post": {
-                "description": "获取到验证码后，验证登录",
+                "description": "获取到验证码后，通过验证码登录",
                 "consumes": [
                     "application/json"
                 ],
@@ -462,7 +405,7 @@ var doc = `{
                 }
             }
         },
-        "/login/getVerificationCode": {
+        "/v1/login/getVerificationCode": {
             "post": {
                 "description": "用户登录，获取验证码，若是第一次登陆则自动注册",
                 "consumes": [
@@ -496,7 +439,7 @@ var doc = `{
                 }
             }
         },
-        "/login/updateToken": {
+        "/v1/login/updateToken": {
             "post": {
                 "description": "用户token过期，重复更新",
                 "consumes": [
@@ -530,7 +473,7 @@ var doc = `{
                 }
             }
         },
-        "/login/verifyLogin": {
+        "/v1/login/verifyLogin": {
             "post": {
                 "description": "验证用户以前登陆所生成的token来验证登陆",
                 "consumes": [
@@ -564,7 +507,7 @@ var doc = `{
                 }
             }
         },
-        "/logout": {
+        "/v1/logout": {
             "post": {
                 "description": "用户退出，清除所有登录状态",
                 "consumes": [
@@ -673,18 +616,6 @@ var doc = `{
                 }
             }
         },
-        "v1.GetEconomicsRecordListReq": {
-            "type": "object"
-        },
-        "v1.GetEntertainmentRecordListReq": {
-            "type": "object"
-        },
-        "v1.GetMilitaryRecordListReq": {
-            "type": "object"
-        },
-        "v1.GetPersonageRecordListReq": {
-            "type": "object"
-        },
         "v1.GetRecordListByKeywordReq": {
             "type": "object",
             "properties": {
@@ -693,13 +624,7 @@ var doc = `{
                 }
             }
         },
-        "v1.GetRecordListReq": {
-            "type": "object"
-        },
         "v1.GetReferenceFileReq": {
-            "type": "object"
-        },
-        "v1.GetSportRecordListReq": {
             "type": "object"
         },
         "v1.GetVerificationCodeReq": {

@@ -46,24 +46,12 @@ definitions:
       uuid:
         type: string
     type: object
-  v1.GetEconomicsRecordListReq:
-    type: object
-  v1.GetEntertainmentRecordListReq:
-    type: object
-  v1.GetMilitaryRecordListReq:
-    type: object
-  v1.GetPersonageRecordListReq:
-    type: object
   v1.GetRecordListByKeywordReq:
     properties:
       keyword:
         type: string
     type: object
-  v1.GetRecordListReq:
-    type: object
   v1.GetReferenceFileReq:
-    type: object
-  v1.GetSportRecordListReq:
     type: object
   v1.GetVerificationCodeReq:
     properties:
@@ -116,18 +104,11 @@ definitions:
 info:
   contact: {}
 paths:
-  /catalog/economicsRecordList:
+  /v1/catalog/economicsRecordList:
     get:
       consumes:
       - application/json
       description: 获取"经济"分类的纪录主题列表
-      parameters:
-      - description: param
-        in: body
-        name: param
-        required: true
-        schema:
-          $ref: '#/definitions/v1.GetEconomicsRecordListReq'
       produces:
       - application/json
       responses:
@@ -137,18 +118,11 @@ paths:
         "50001":
           schema:
             $ref: '#/definitions/github.com_hfeng101_niwo_controller_catalog_v1.ResponseContent'
-  /catalog/entertainmentRecordList:
+  /v1/catalog/entertainmentRecordList:
     get:
       consumes:
       - application/json
       description: 获取"娱乐"分类的纪录主题列表
-      parameters:
-      - description: param
-        in: body
-        name: param
-        required: true
-        schema:
-          $ref: '#/definitions/v1.GetEntertainmentRecordListReq'
       produces:
       - application/json
       responses:
@@ -158,18 +132,17 @@ paths:
         "50001":
           schema:
             $ref: '#/definitions/github.com_hfeng101_niwo_controller_catalog_v1.ResponseContent'
-  /catalog/list:
+  /v1/catalog/list:
     get:
       consumes:
       - application/json
       description: 获取指定分类的纪录主题列表
       parameters:
       - description: param
-        in: body
-        name: param
+        in: query
+        name: catalog
         required: true
-        schema:
-          $ref: '#/definitions/v1.GetRecordListReq'
+        type: string
       produces:
       - application/json
       responses:
@@ -179,8 +152,8 @@ paths:
         "50001":
           schema:
             $ref: '#/definitions/github.com_hfeng101_niwo_controller_catalog_v1.ResponseContent'
-  /catalog/listByKey:
-    get:
+  /v1/catalog/listByKey:
+    post:
       consumes:
       - application/json
       description: 根据搜索获取关键字对应的主题列表
@@ -200,18 +173,11 @@ paths:
         "50001":
           schema:
             $ref: '#/definitions/github.com_hfeng101_niwo_controller_catalog_v1.ResponseContent'
-  /catalog/militaryRecordList:
+  /v1/catalog/militaryRecordList:
     get:
       consumes:
       - application/json
       description: 获取"军事"分类的纪录主题列表
-      parameters:
-      - description: param
-        in: body
-        name: param
-        required: true
-        schema:
-          $ref: '#/definitions/v1.GetMilitaryRecordListReq'
       produces:
       - application/json
       responses:
@@ -221,18 +187,11 @@ paths:
         "50001":
           schema:
             $ref: '#/definitions/github.com_hfeng101_niwo_controller_catalog_v1.ResponseContent'
-  /catalog/personageRecordList:
+  /v1/catalog/personageRecordList:
     get:
       consumes:
       - application/json
       description: 获取"人物"分类的纪录主题列表
-      parameters:
-      - description: param
-        in: body
-        name: param
-        required: true
-        schema:
-          $ref: '#/definitions/v1.GetPersonageRecordListReq'
       produces:
       - application/json
       responses:
@@ -242,18 +201,11 @@ paths:
         "50001":
           schema:
             $ref: '#/definitions/github.com_hfeng101_niwo_controller_catalog_v1.ResponseContent'
-  /catalog/sportRecordList:
+  /v1/catalog/sportRecordList:
     get:
       consumes:
       - application/json
       description: 获取"体育"分类的纪录主题列表
-      parameters:
-      - description: param
-        in: body
-        name: param
-        required: true
-        schema:
-          $ref: '#/definitions/v1.GetSportRecordListReq'
       produces:
       - application/json
       responses:
@@ -263,7 +215,7 @@ paths:
         "50001":
           schema:
             $ref: '#/definitions/github.com_hfeng101_niwo_controller_catalog_v1.ResponseContent'
-  /content/getReferenceFile:
+  /v1/content/getReferenceFile:
     get:
       consumes:
       - application/json
@@ -284,7 +236,7 @@ paths:
         "50001":
           schema:
             $ref: '#/definitions/github.com_hfeng101_niwo_controller_content_v1.ResponseContent'
-  /content/theme:
+  /v1/content/theme:
     get:
       consumes:
       - application/json
@@ -345,7 +297,7 @@ paths:
         "50001":
           schema:
             $ref: '#/definitions/github.com_hfeng101_niwo_controller_content_v1.ResponseContent'
-  /content/uploadFile:
+  /v1/content/uploadFile:
     post:
       consumes:
       - application/json
@@ -366,11 +318,11 @@ paths:
         "50001":
           schema:
             $ref: '#/definitions/github.com_hfeng101_niwo_controller_content_v1.ResponseContent'
-  /login:
+  /v1/login:
     post:
       consumes:
       - application/json
-      description: 获取到验证码后，验证登录
+      description: 获取到验证码后，通过验证码登录
       parameters:
       - description: param
         in: body
@@ -387,7 +339,7 @@ paths:
         "50001":
           schema:
             $ref: '#/definitions/github.com_hfeng101_niwo_controller_user_v1.ResponseContent'
-  /login/getVerificationCode:
+  /v1/login/getVerificationCode:
     post:
       consumes:
       - application/json
@@ -408,7 +360,7 @@ paths:
         "50001":
           schema:
             $ref: '#/definitions/github.com_hfeng101_niwo_controller_user_v1.ResponseContent'
-  /login/updateToken:
+  /v1/login/updateToken:
     post:
       consumes:
       - application/json
@@ -429,7 +381,7 @@ paths:
         "50001":
           schema:
             $ref: '#/definitions/github.com_hfeng101_niwo_controller_user_v1.ResponseContent'
-  /login/verifyLogin:
+  /v1/login/verifyLogin:
     post:
       consumes:
       - application/json
@@ -450,7 +402,7 @@ paths:
         "50001":
           schema:
             $ref: '#/definitions/github.com_hfeng101_niwo_controller_user_v1.ResponseContent'
-  /logout:
+  /v1/logout:
     post:
       consumes:
       - application/json

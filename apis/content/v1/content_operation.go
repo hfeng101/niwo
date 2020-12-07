@@ -15,7 +15,7 @@ import (
 // @Param Param body ContentController.GetContentReq true "param"
 // @Success 20000 {object} ContentController.ResponseContent	""
 // @Failure 50001 {object} ContentController.ResponseContent	""
-// @Router /content/theme [get]
+// @Router /v1/content/theme [get]
 // @host niwofly.com
 // @BasePath /v1
 func GetContent(ctx iris.Context) {
@@ -32,7 +32,7 @@ func GetContent(ctx iris.Context) {
 // @Param Param body ContentController.AddContentReq true "param"
 // @Success 20000 {object} ContentController.ResponseContent	""
 // @Failure 50001 {object} ContentController.ResponseContent	""
-// @Router /content/theme [post]
+// @Router /v1/content/theme [post]
 // @host niwofly.com
 // @BasePath /v1
 func AddContent(ctx iris.Context) {
@@ -49,7 +49,7 @@ func AddContent(ctx iris.Context) {
 // @Param Param body ContentController.UpdateContentReq true "param"
 // @Success 20000 {object} ContentController.ResponseContent	""
 // @Failure 50001 {object} ContentController.ResponseContent	""
-// @Router /content/theme [put]
+// @Router /v1/content/theme [put]
 // @host niwofly.com
 // @BasePath /v1
 func UpdateContent(ctx iris.Context) {
@@ -66,7 +66,7 @@ func UpdateContent(ctx iris.Context) {
 // @Param Param body ContentController.UpdateContentReq true "param"
 // @Success 20000 {object} ContentController.ResponseContent	""
 // @Failure 50001 {object} ContentController.ResponseContent	""
-// @Router /content/uploadFile [post]
+// @Router /v1/content/uploadFile [post]
 // @host niwofly.com
 // @BasePath /v1
 func UploadFile(ctx iris.Context) {
@@ -83,7 +83,7 @@ func UploadFile(ctx iris.Context) {
 // @Param Param body ContentController.GetReferenceFileReq true "param"
 // @Success 20000 {object} ContentController.ResponseContent	""
 // @Failure 50001 {object} ContentController.ResponseContent	""
-// @Router /content/getReferenceFile [get]
+// @Router /v1/content/getReferenceFile [get]
 // @host niwofly.com
 // @BasePath /v1
 func GetReferenceFile(ctx iris.Context) {

@@ -15,23 +15,23 @@ import (
 // @Param param body UserController.GetVerificationCodeReq true "param"
 // @Success 20000 {object} UserController.ResponseContent	""
 // @Failure 50001 {object} UserController.ResponseContent	""
-// @Router /login/getVerificationCode [post]
+// @Router /v1/login/getVerificationCode [post]
 // @BasePath /v1
 func GetVerificationCode(ctx iris.Context) {
 	UserController.GetVerificationCode(ctx)
 }
 
-// @title user operation API
-// @version 1.0
-// @contact.name user operation
+// @Title user operation API
+// @Version 1.0
+// @Contact.name user operation
 // @contact.url http://www.niwofly.com
-// @Description 获取到验证码后，验证登录
+// @Description 获取到验证码后，通过验证码登录
 // @Accept  json
 // @Produce  json
 // @Param param body UserController.UserRegistrationOrLoginReq true "param"
 // @Success 20000 {object} UserController.ResponseContent	""
 // @Failure 50001 {object} UserController.ResponseContent	""
-// @Router /login [post]
+// @Router /v1/login [post]
 // @BasePath /v1
 func Login(ctx iris.Context) {
 	UserController.Login(ctx)
@@ -47,7 +47,7 @@ func Login(ctx iris.Context) {
 // @Param param body UserController.LogoutReq true "param"
 // @Success 20000 {object} UserController.ResponseContent	""
 // @Failure 50001 {object} UserController.ResponseContent	""
-// @Router /logout [post]
+// @Router /v1/logout [post]
 // @BasePath /v1
 func Logout(ctx iris.Context) {
 	UserController.Logout(ctx)
@@ -63,7 +63,7 @@ func Logout(ctx iris.Context) {
 // @Param param body UserController.VerifyLoginReq true "param"
 // @Success 20000 {object} UserController.ResponseContent	""
 // @Failure 50001 {object} UserController.ResponseContent	""
-// @Router /login/verifyLogin [post]
+// @Router /v1/login/verifyLogin [post]
 // @host niwofly.com
 // @BasePath /v1
 func VerifyLogin(ctx iris.Context) {
@@ -80,7 +80,7 @@ func VerifyLogin(ctx iris.Context) {
 // @Param param body UserController.UpdateTokenReq true "param"
 // @Success 20000 {object} UserController.ResponseContent	""
 // @Failure 50001 {object} UserController.ResponseContent	""
-// @Router /login/updateToken [post]
+// @Router /v1/login/updateToken [post]
 // @host niwofly.com
 // @BasePath /v1
 func UpdateToken(ctx iris.Context) {

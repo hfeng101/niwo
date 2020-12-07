@@ -7,7 +7,7 @@ require (
 	github.com/Joker/hpp v1.0.0 // indirect
 	github.com/ajg/form v1.5.1 // indirect
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
-	github.com/aliyun/alibaba-cloud-sdk-go v1.61.747 // indirect
+	github.com/aliyun/alibaba-cloud-sdk-go v1.61.747
 	github.com/aliyun/aliyun-oss-go-sdk v2.1.5+incompatible
 	github.com/andybalholm/brotli v1.0.1-0.20200619015827-c3da72aa01ed // indirect
 	github.com/cihub/seelog v0.0.0-20170130134532-f561c5e57575
