@@ -106,7 +106,7 @@ func GetRecordList(ctx iris.Context) {
 	//从数据库里获取列表，并分列显示
 	switch catalog {
 		case consts.PERSONAGE:
-			personageRecordList := []*mysql.PersonageRecordList{}
+			personageRecordList := &[]mysql.PersonageRecordList{}
 			//从数据库里获取列表，并分列显示
 			dbHandle := mysql.GetMysqlDbHandle()
 			//关键字模糊查找
@@ -119,7 +119,7 @@ func GetRecordList(ctx iris.Context) {
 
 			resBody.Data = personageRecordList
 		case consts.SPORT:
-			sportRecordList := []*mysql.SportRecordList{}
+			sportRecordList := &[]mysql.SportRecordList{}
 			//从数据库里获取列表，并分列显示
 			dbHandle := mysql.GetMysqlDbHandle()
 			//关键字模糊查找
@@ -132,7 +132,7 @@ func GetRecordList(ctx iris.Context) {
 
 			resBody.Data = sportRecordList
 		case consts.ECONOMICS:
-			economicsRecordList := []*mysql.EconomicsRecordList{}
+			economicsRecordList := &[]mysql.EconomicsRecordList{}
 			//从数据库里获取列表，并分列显示
 			dbHandle := mysql.GetMysqlDbHandle()
 			//关键字模糊查找
@@ -145,7 +145,7 @@ func GetRecordList(ctx iris.Context) {
 
 			resBody.Data = economicsRecordList
 		case consts.MILITARY:
-			militaryRecordList := []*mysql.MilitaryRecordList{}
+			militaryRecordList := &[]mysql.MilitaryRecordList{}
 			//从数据库里获取列表，并分列显示
 			dbHandle := mysql.GetMysqlDbHandle()
 			//关键字模糊查找
@@ -158,7 +158,7 @@ func GetRecordList(ctx iris.Context) {
 
 			resBody.Data = militaryRecordList
 		case consts.ENTERTAINMENT:
-			entertainmentRecordList := []*mysql.EntertainmentRecordList{}
+			entertainmentRecordList := &[]mysql.EntertainmentRecordList{}
 			//从数据库里获取列表，并分列显示
 			dbHandle := mysql.GetMysqlDbHandle()
 			//关键字模糊查找
@@ -195,7 +195,7 @@ func GetPersonageRecordList(ctx iris.Context) {
 	//	return
 	//}
 
-	personageRecordList := []*mysql.PersonageRecordList{}
+	personageRecordList := &[]mysql.PersonageRecordList{}
 	//从数据库里获取列表，并分列显示
 	dbHandle := mysql.GetMysqlDbHandle()
 	//关键字模糊查找
@@ -228,7 +228,7 @@ func GetSportRecordList(ctx iris.Context) {
 	//	return
 	//}
 
-	sportRecordList := []*mysql.SportRecordList{}
+	sportRecordList := &[]mysql.SportRecordList{}
 	//从数据库里获取列表，并分列显示
 	dbHandle := mysql.GetMysqlDbHandle()
 	//关键字模糊查找
@@ -259,11 +259,11 @@ func GetEconomicsRecordList(ctx iris.Context) {
 	//	return
 	//}
 
-	economicsRecordList := []*mysql.EconomicsRecordList{}
+	economicsRecordList := &[]mysql.EconomicsRecordList{}
 	//从数据库里获取列表，并分列显示
 	dbHandle := mysql.GetMysqlDbHandle()
 	//关键字模糊查找
-	if dbHandle.Find(economicsRecordList) == nil {
+	if dbHandle.Where("").Find(economicsRecordList) == nil {
 		seelog.Errorf("Get economics record list failed from mysql failed")
 		resBody.Code = consts.ERRORCODE
 		resBody.Message = consts.ERRORCODEMESSAGE
@@ -290,7 +290,7 @@ func GetMilitaryRecordList(ctx iris.Context) {
 	//	return
 	//}
 
-	militaryRecordList := []*mysql.MilitaryRecordList{}
+	militaryRecordList := &[]mysql.MilitaryRecordList{}
 	//从数据库里获取列表，并分列显示
 	dbHandle := mysql.GetMysqlDbHandle()
 	//关键字模糊查找
@@ -321,7 +321,7 @@ func GetEntertainmentRecordList(ctx iris.Context) {
 	//	return
 	//}
 
-	entertainmentRecordList := []*mysql.EntertainmentRecordList{}
+	entertainmentRecordList := &[]mysql.EntertainmentRecordList{}
 	//从数据库里获取列表，并分列显示
 	dbHandle := mysql.GetMysqlDbHandle()
 	//关键字模糊查找

@@ -84,7 +84,7 @@ func AddContent(ctx iris.Context){
 	}
 
 	//先生成uuid
-	uuid := uuid2.New()
+	uuid := uuid2.New().String()
 	mysqlDbHandle := mysql.GetMysqlDbHandle()
 
 	//生成要写入mongodb的内容
@@ -98,13 +98,15 @@ func AddContent(ctx iris.Context){
 			//先把索引存入mysql
 			count := 0
 			peronageRecord := &mysql.PersonageRecordList{
-				Uuid: uuid.String(),
+				Uuid: uuid,
 				Theme: req.Theme,
 				Keyword: req.Keyword,
 			}
-			mysqlDbHandle.FirstOrCreate(peronageRecord)
+			mysqlDbHandle.Create(peronageRecord)
+
 			//确认落库成功
-			mysqlDbHandle.Where("").Find(peronageRecord).Count(&count)
+			peronageRecordList := &[]mysql.PersonageRecordList{}
+			mysqlDbHandle.Where("uuid=?", uuid).Find(peronageRecordList).Count(&count)
 			if count == 0 {
 				seelog.Errorf("Mysql first create failed!!!")
 				resBody.Code = consts.ERRORCODE
@@ -123,13 +125,14 @@ func AddContent(ctx iris.Context){
 			//先把索引存入mysql
 			count := 0
 			sportRecord := &mysql.SportRecordList{
-				Uuid: uuid.String(),
+				Uuid: uuid,
 				Theme: req.Theme,
 				Keyword: req.Keyword,
 			}
-			mysqlDbHandle.FirstOrCreate(sportRecord)
+			mysqlDbHandle.Create(sportRecord)
 			//确认落库成功
-			mysqlDbHandle.Where("").Find(sportRecord).Count(&count)
+			sportRecordList := &[]mysql.SportRecordList{}
+			mysqlDbHandle.Where("uuid=?",uuid).Find(sportRecordList).Count(&count)
 			if count == 0 {
 				seelog.Errorf("Mysql first create failed!!!")
 				resBody.Code = consts.ERRORCODE
@@ -147,14 +150,15 @@ func AddContent(ctx iris.Context){
 		case consts.ECONOMICS:
 			//先把索引存入mysql
 			count := 0
-			economicsRecord := &mysql.SportRecordList{
-				Uuid: uuid.String(),
+			economicsRecord := &mysql.EconomicsRecordList{
+				Uuid: uuid,
 				Theme: req.Theme,
 				Keyword: req.Keyword,
 			}
-			mysqlDbHandle.FirstOrCreate(economicsRecord)
+			mysqlDbHandle.Create(economicsRecord)
 			//确认落库成功
-			mysqlDbHandle.Where("").Find(economicsRecord).Count(&count)
+			economicsRecordList := &[]mysql.EconomicsRecordList{}
+			mysqlDbHandle.Where("uuid=?",uuid).Find(economicsRecordList).Count(&count)
 			if count == 0 {
 				seelog.Errorf("Mysql first create failed!!!")
 				resBody.Code = consts.ERRORCODE
@@ -172,14 +176,15 @@ func AddContent(ctx iris.Context){
 		case consts.MILITARY:
 			//先把索引存入mysql
 			count := 0
-			militaryRecord := &mysql.SportRecordList{
-				Uuid: uuid.String(),
+			militaryRecord := &mysql.MilitaryRecordList{
+				Uuid: uuid,
 				Theme: req.Theme,
 				Keyword: req.Keyword,
 			}
-			mysqlDbHandle.FirstOrCreate(militaryRecord)
+			mysqlDbHandle.Create(militaryRecord)
 			//确认落库成功
-			mysqlDbHandle.Where("").Find(militaryRecord).Count(&count)
+			militaryRecordList := &[]mysql.MilitaryRecordList{}
+			mysqlDbHandle.Where("uuid=?",uuid).Find(militaryRecordList).Count(&count)
 			if count == 0 {
 				seelog.Errorf("Mysql first create failed!!!")
 				resBody.Code = consts.ERRORCODE
@@ -197,14 +202,15 @@ func AddContent(ctx iris.Context){
 		case consts.ENTERTAINMENT:
 			//先把索引存入mysql
 			count := 0
-			sportRecord := &mysql.SportRecordList{
-				Uuid: uuid.String(),
+			entertainmentRecord := &mysql.EntertainmentRecordList{
+				Uuid: uuid,
 				Theme: req.Theme,
 				Keyword: req.Keyword,
 			}
-			mysqlDbHandle.FirstOrCreate(sportRecord)
+			mysqlDbHandle.Create(entertainmentRecord)
 			//确认落库成功
-			mysqlDbHandle.Where("").Find(sportRecord).Count(&count)
+			entertainmentRecordList := &[]mysql.EntertainmentRecordList{}
+			mysqlDbHandle.Where("uuid=?",uuid).Find(entertainmentRecordList).Count(&count)
 			//storage.MysqlGlobalOrm.FirstOrCreate(kubeConf, `cfg_content = "`+kubeConf.CfgConetent+`"`)
 			//storage.MysqlGlobalOrm.Where("cfg_content = ?", kubeConf.CfgConetent).Find(&[]*v1.KubeConfig{}).Count(&count)
 			if count == 0 {
