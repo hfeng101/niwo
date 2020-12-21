@@ -216,13 +216,11 @@ var doc = `{
                 ],
                 "parameters": [
                     {
+                        "type": "string",
                         "description": "param",
-                        "name": "Param",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/v1.GetReferenceFileReq"
-                        }
+                        "name": "objectKey",
+                        "in": "query",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -250,13 +248,25 @@ var doc = `{
                 ],
                 "parameters": [
                     {
+                        "type": "string",
                         "description": "param",
-                        "name": "Param",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/v1.GetContentReq"
-                        }
+                        "name": "catalog",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "param",
+                        "name": "theme",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "param",
+                        "name": "uuid",
+                        "in": "query",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -353,7 +363,7 @@ var doc = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/v1.UpdateContentReq"
+                            "$ref": "#/definitions/v1.UploadFileReq"
                         }
                     }
                 ],
@@ -602,30 +612,16 @@ var doc = `{
                 }
             }
         },
-        "v1.GetContentReq": {
-            "type": "object",
-            "properties": {
-                "catalogType": {
-                    "type": "string"
-                },
-                "theme": {
-                    "type": "string"
-                },
-                "uuid": {
-                    "type": "string"
-                }
-            }
-        },
         "v1.GetRecordListByKeywordReq": {
             "type": "object",
             "properties": {
+                "catalog": {
+                    "type": "string"
+                },
                 "keyword": {
                     "type": "string"
                 }
             }
-        },
-        "v1.GetReferenceFileReq": {
-            "type": "object"
         },
         "v1.GetVerificationCodeReq": {
             "type": "object",
@@ -670,6 +666,21 @@ var doc = `{
                     "type": "string"
                 },
                 "phoneNumber": {
+                    "type": "string"
+                }
+            }
+        },
+        "v1.UploadFileReq": {
+            "type": "object",
+            "properties": {
+                "catalog": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "type": {
+                    "description": "类型有file/picture/short-video/long-video/audio",
                     "type": "string"
                 }
             }

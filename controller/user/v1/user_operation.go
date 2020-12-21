@@ -18,7 +18,10 @@ import (
 
 var (
 	ExpireTime = 3600000	//token有效期
-	SignName = "你我"
+
+	//TODO
+	//SignName = "你我"
+	SignName = "ABC商城"
 )
 
 type JwtClaims struct {
@@ -139,7 +142,7 @@ func UpdateToken(ctx iris.Context) {
 	userInfo := &mysql.UserInfo{}
 
 	mysqlHandle := mysql.GetMysqlDbHandle()
-	if err := mysqlHandle.Where("phone_number=%s", req.PhoneNumber).First(userInfo).Error; err != nil {
+	if err := mysqlHandle.Where("phone_number=?", req.PhoneNumber).First(userInfo).Error; err != nil {
 		seelog.Errorf("get userinfo by key phone_number=%v failed, err is %v", req.PhoneNumber, err.Error())
 		rsp.Code = consts.ERRORCODE
 		rsp.Message = consts.ERRORCODEMESSAGE + "failed,without user info"
@@ -192,7 +195,19 @@ func Logout(ctx iris.Context) {
 	}
 
 	mysqlHandle := mysql.GetMysqlDbHandle()
-	if err := mysqlHandle.Where("phone_number=%s", req.PhoneNumber).Updates(mysql.UserInfo{VerificationCode: "", Token: "", RefreshToken: ""}).Error; err != nil {
+	userInfo := &mysql.UserInfo{}
+	if err := mysqlHandle.Model(&mysql.UserInfo{}).Where("phone_number=?", req.PhoneNumber).First(userInfo).Error; err != nil {
+		seelog.Errorf("can not get user for phoneNumber:%v, err is %v", req.PhoneNumber, err.Error())
+		rsp.Code = consts.ERRORCODE
+		rsp.Message = consts.ERRORCODEMESSAGE + err.Error()
+		return
+	}
+
+	userInfo.VerificationCode = "nil"
+	userInfo.Token = "nil"
+	userInfo.RefreshToken = "nil"
+
+	if err := mysqlHandle.Model(&mysql.UserInfo{}).Where("phone_number=?", req.PhoneNumber).Update(userInfo).Error; err != nil {
 		seelog.Errorf("Clean  VerificationCode、Token、RefreshToken failed, err is %v", err.Error())
 		rsp.Code = consts.ERRORCODE
 		rsp.Message = consts.ERRORCODEMESSAGE
@@ -219,24 +234,34 @@ func generateAndStoreVerificationCode(phoneNumber string) (string,error){
 func storeVerificationCode(phoneNumber string, verificationCode string) error{
 	mysqlHandle := mysql.GetMysqlDbHandle()
 
-	//新建用户信息，新用户，直接注册
-	uuid := uuid2.New().String()
-	name := "new"+phoneNumber
+	userInfo := &mysql.UserInfo{}
+	if err := mysqlHandle.Model(mysql.UserInfo{}).Where("phone_number=?", phoneNumber).First(userInfo).Error; err != nil {
+		seelog.Infof("phone number: %v is new user", phoneNumber)
+		//新建用户信息，新用户，直接注册
+		uuid := uuid2.New().String()
+		name := "new"+phoneNumber
 
-	userInfo := &mysql.UserInfo{
-		Uuid: uuid,
-		Name: name,
-		Password: "",
-		PhoneNumber: phoneNumber,
-		VerificationCode: verificationCode,
-		Email:"",
-		Token:"",
-		RefreshToken: "",
-		Secret: "",
-	}
-	if err := mysqlHandle.Create(userInfo).Error; err != nil {
-		seelog.Errorf("create user info failed, err is %v", err.Error())
-		return err
+		userInfo := &mysql.UserInfo{
+			Uuid: uuid,
+			Name: name,
+			Password: "",
+			PhoneNumber: phoneNumber,
+			VerificationCode: verificationCode,
+			Email:"",
+			Token:"",
+			RefreshToken: "",
+			Secret: "",
+		}
+		if err := mysqlHandle.Create(userInfo).Error; err != nil {
+			seelog.Errorf("create user info failed, err is %v", err.Error())
+			return err
+		}
+	}else {
+		userInfo.VerificationCode = verificationCode
+		if err := mysqlHandle.Model(&mysql.UserInfo{}).Where("phone_number=?", phoneNumber).Update(userInfo).Error;err != nil {
+			seelog.Errorf("update verificationCode for phonenumber:%v failed", phoneNumber)
+			return err
+		}
 	}
 
 	return nil
@@ -248,11 +273,17 @@ func pushVerificationCode(verificationCode string, phoneNumber string) error{
 
 	dysmsapiHandle := cloud.GetDysmsapiHandle()
 	request := dysmsapi.CreateSendSmsRequest()
+	if request == nil {
+		seelog.Errorf("pushVerificationCode failed, CreateSendSmsRequest failed")
+		return errors.New("pushVerificationCode failed,  CreateSendSmsRequest failed!")
+	}
 	request.Scheme = "https"
-	request.TemplateCode = verificationCode
+	request.TemplateCode = "SMS_206480179"
+	request.TemplateParam = "{\"code\":\""+verificationCode+"\"}"
 	request.PhoneNumbers = phoneNumber
 	request.SignName = SignName
 
+	seelog.Errorf("request is %v", *request)
 	response,err := dysmsapiHandle.SendSms(request)
 	if err != nil {
 		seelog.Errorf("SendSms failed, err is %v", err.Error())
@@ -269,7 +300,7 @@ func getToken(loginInfo *UserRegistrationOrLoginReq) (*mysql.UserInfo,error){
 	userInfo := &mysql.UserInfo{}
 	mysqlHandle := mysql.GetMysqlDbHandle()
 
-	if err := mysqlHandle.Where("phone_number=%s", loginInfo.PhoneNumber).First(userInfo).Error; err != nil {
+	if err := mysqlHandle.Where("phone_number=?", loginInfo.PhoneNumber).First(userInfo).Error; err != nil {
 		seelog.Errorf("get loginInfo from mysql failed, user is not registry!")
 		return nil,errors.New("verify VerificationCode failed, user is not registry!")
 	}
@@ -294,8 +325,9 @@ func getToken(loginInfo *UserRegistrationOrLoginReq) (*mysql.UserInfo,error){
 	//直接更新，生成token，并更新
 	userInfo.Token = token
 	userInfo.RefreshToken = refreshToken
+	userInfo.Secret = secret
 
-	if err := mysqlHandle.Where("phone_number=%s",loginInfo.PhoneNumber).Update("verification_code", loginInfo.VerificationCode).Error; err != nil {
+	if err := mysqlHandle.Model(&mysql.UserInfo{}).Where("phone_number=?",loginInfo.PhoneNumber).Update(userInfo).Error; err != nil {
 		seelog.Errorf("update failed, err is %v", err.Error())
 		return nil, err
 	}
@@ -330,6 +362,12 @@ func generateToken(loginInfo *UserRegistrationOrLoginReq, secret string)(string,
 		return "", "", err
 	}
 
+	seelog.Infof("[1111]: secret is %v \n token is %v \n refreshToken is %v", secret, token, refreshToken)
+
+	seelog.Infof("[2222]: token is %v \n refreshToken is %v", *token, *refreshToken)
+
+	seelog.Infof("[3333]: singedToken is %v \n singedRefreshToken is %v", singedToken, singedRefreshToken)
+
 	return singedToken, singedRefreshToken, nil
 }
 
@@ -337,13 +375,15 @@ func verifyToken(param *VerifyLoginReq) error{
 	userInfo := &mysql.UserInfo{}
 
 	mysqlHandle := mysql.GetMysqlDbHandle()
-	mysqlHandle.Where("phone_number=%s",param.PhoneNumber).First(userInfo)
+	mysqlHandle.Where("phone_number=?",param.PhoneNumber).First(userInfo)
 
 	token, err := jwt.ParseWithClaims(param.Token, &JwtClaims{}, func(token *jwt.Token)(interface{}, error){
 		return []byte(userInfo.Secret), nil
 	})
+
+	seelog.Infof("token is %v", token)
 	if err != nil {
-		seelog.Errorf("ParseWithClaims failed, err is %v", err.Error())
+		seelog.Errorf("ParseWithClaims failed, err is %v, token is %v", err.Error(), token)
 		return err
 	}
 

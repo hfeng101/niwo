@@ -12,7 +12,9 @@ import (
 // @Description 获取指定主题的具体内容
 // @Accept  json
 // @Produce  json
-// @Param Param body ContentController.GetContentReq true "param"
+//@Param catalog query string true "param"
+//@Param theme query string true "param"
+//@Param uuid query string true "param"
 // @Success 20000 {object} ContentController.ResponseContent	""
 // @Failure 50001 {object} ContentController.ResponseContent	""
 // @Router /v1/content/theme [get]
@@ -56,14 +58,14 @@ func UpdateContent(ctx iris.Context) {
 	ContentController.UpdateContent(ctx)
 }
 
-// @title Update Content API
+// @title Update File API
 // @version 1.0
 // @contact.name content operation
 // @contact.url http://www.niwofly.com
 // @Description 用户上传图片、音、视频文件
 // @Accept  json
 // @Produce  json
-// @Param Param body ContentController.UpdateContentReq true "param"
+// @Param Param body ContentController.UploadFileReq true "param"
 // @Success 20000 {object} ContentController.ResponseContent	""
 // @Failure 50001 {object} ContentController.ResponseContent	""
 // @Router /v1/content/uploadFile [post]
@@ -80,7 +82,7 @@ func UploadFile(ctx iris.Context) {
 // @Description 用户获取图片、音、视频文件
 // @Accept  json
 // @Produce  json
-// @Param Param body ContentController.GetReferenceFileReq true "param"
+// @Param objectKey query string true "param"
 // @Success 20000 {object} ContentController.ResponseContent	""
 // @Failure 50001 {object} ContentController.ResponseContent	""
 // @Router /v1/content/getReferenceFile [get]

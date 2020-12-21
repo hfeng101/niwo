@@ -29,3 +29,10 @@ func GetDysmsapiHandle() *dysmsapi.Client {
 
 	return DysmsapiHandle
 }
+
+func DestroyDysmsapiHandle() {
+	Lock.RLock()
+	defer Lock.RUnlock()
+
+	//DysmsapiHandle.
+}

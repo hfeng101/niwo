@@ -8,12 +8,13 @@ import (
 	"github.com/hfeng101/niwo/utils/consts"
 	"github.com/kataras/iris/v12"
 	"go.mongodb.org/mongo-driver/bson"
+	"strconv"
 	"strings"
 	"time"
 )
 
 var (
-	UploadPrefix = "upload/"
+	GetReferenceFilePrefix = "v1/content/GetReferenceFile?objectKey="
 )
 
 func GetContent(ctx iris.Context){
@@ -22,30 +23,36 @@ func GetContent(ctx iris.Context){
 		Message: consts.SUCCESSCODEMESSAGE,
 		Data: nil,
 	}
-	req := &GetContentReq{}
+	//req := &GetContentReq{}
 
 	defer ctx.JSON(resBody)
-	if err := ctx.ReadJSON(req); err != nil {
-		seelog.Errorf("Input param is valid, err is %v",err.Error())
-		resBody.Code = consts.ERRORCODE
-		resBody.Message = consts.ERRORCODEMESSAGE + err.Error()
-		return
-	}
+	//if err := ctx.ReadJSON(req); err != nil {
+	//	seelog.Errorf("Input param is valid, err is %v",err.Error())
+	//	resBody.Code = consts.ERRORCODE
+	//	resBody.Message = consts.ERRORCODEMESSAGE + err.Error()
+	//	return
+	//}
 
 	//联合查询，从mysql查询到mongodb的键值，然后去mongodb查内容
-	//record := &storage.GenerationRecord{}
-	//dbHandle := storage.GetMysqlDbHandle()
+	//record := &mysql.GenerationRecord{}
+	//dbHandle := mysql.GetMysqlDbHandle()
 	//dbHandle.Where("uuid = ", req.Uuid).Find(record)
+
+	catalog := ctx.Request().URL.Query().Get("catalog")
+	//theme := ctx.Request().URL.Query().Get("theme")
+	uuid := ctx.Request().URL.Query().Get("uuid")
 
 	//从mongodb获取对应UUID中的内容
 	content := &storage.GenerationRecordContent{}
 	mongoDbHandle := storage.GetMongoDbHandle()
 
 	filter := bson.M{
-		"uuid": req.Uuid,
+		//"uuid": req.Uuid,
+		"uuid": uuid,
 	}
 
-	switch req.CatalogType {
+	//switch req.CatalogType {
+	switch catalog {
 		case consts.PERSONAGE:
 			mongoDbHandle.Collection(consts.PERSONAGE).FindOne(ctx.Request().Context(),filter).Decode(content)
 		case consts.SPORT:
@@ -319,15 +326,15 @@ func UploadFile(ctx iris.Context){
 		Message: consts.SUCCESSCODEMESSAGE,
 		Data: nil,
 	}
-	req := &UploadFileReq{}
+	//req := &UploadFileReq{}
 
 	defer ctx.JSON(resBody)
-	if err := ctx.ReadJSON(req); err != nil {
-		seelog.Errorf("Input param is valid, err is %v",err.Error())
-		resBody.Code = consts.ERRORCODE
-		resBody.Message = consts.ERRORCODEMESSAGE + err.Error()
-		return
-	}
+	//if err := ctx.ReadJSON(req); err != nil {
+	//	seelog.Errorf("Input param is valid, err is %v",err.Error())
+	//	resBody.Code = consts.ERRORCODE
+	//	resBody.Message = consts.ERRORCODEMESSAGE + err.Error()
+	//	return
+	//}
 
 	file,info,err := ctx.FormFile("uploadfile")
 	if err != nil {
@@ -338,13 +345,15 @@ func UploadFile(ctx iris.Context){
 	}
 	defer file.Close()
 
-	catalog := ctx.GetHeader("catalog")
-	if catalog == "" {
-		seelog.Errorf("GetHeader catalog failed, catalog header is nil",err.Error())
-		resBody.Code = consts.ERRORCODE
-		resBody.Message = consts.ERRORCODEMESSAGE + "without catalog header"
-		return
-	}
+	//TODO
+	catalog := consts.PERSONAGE
+	//catalog := ctx.GetHeader("catalog")
+	//if catalog == "" {
+	//	seelog.Errorf("GetHeader catalog failed, catalog header is nil",err.Error())
+	//	resBody.Code = consts.ERRORCODE
+	//	resBody.Message = consts.ERRORCODEMESSAGE + "without catalog header"
+	//	return
+	//}
 	//type := ctx.GetHeader("")
 	objectKey, err := generateObjectKey(catalog, info.Filename)
 	if err != nil {
@@ -363,7 +372,7 @@ func UploadFile(ctx iris.Context){
 	}
 
 	//返回文件可访问的URL
-	resBody.Data = consts.Host + UploadPrefix + objectKey
+	resBody.Data = consts.Host + GetReferenceFilePrefix + objectKey
 }
 
 func GetReferenceFile(ctx iris.Context){
@@ -372,32 +381,15 @@ func GetReferenceFile(ctx iris.Context){
 		Message: consts.SUCCESSCODEMESSAGE,
 		Data: nil,
 	}
-	req := &GetReferenceFileReq{}
 
 	defer ctx.JSON(resBody)
-	if err := ctx.ReadJSON(req); err != nil {
-		seelog.Errorf("Input param is valid, err is %v",err.Error())
-		resBody.Code = consts.ERRORCODE
-		resBody.Message = consts.ERRORCODEMESSAGE + err.Error()
-		return
-	}
 
-	path := ctx.Path()
-	seelog.Infof("Request path is %v", path)
-
-	pathSplit := strings.Split(path, UploadPrefix)
-	if len(pathSplit) < 2 {
-		seelog.Errorf("Invalid Path")
-		resBody.Code = consts.ERRORCODE
-		resBody.Message = consts.ERRORCODEMESSAGE + "Invalid Path"
-		return
-	}
-	objectKey := pathSplit[len(pathSplit) - 1]
+	objectKey := ctx.Request().URL.Query().Get("objectKey")
 
 	//获取catalog
 	objectInfo := &mysql.OsObjectInfoList{}
 	mysqlHandle := mysql.GetMysqlDbHandle()
-	if err := mysqlHandle.Where("object_key=%s", objectKey).First(objectInfo).Error; err != nil {
+	if err := mysqlHandle.Where("object_key=?", objectKey).First(objectInfo).Error; err != nil {
 		seelog.Errorf("Get objectk info failed, err is %v", err.Error())
 		resBody.Code = consts.ERRORCODE
 		resBody.Message = consts.ERRORCODEMESSAGE + err.Error()
@@ -417,10 +409,10 @@ func GetReferenceFile(ctx iris.Context){
 
 //生成存储key值，并保存到数据库，key构成：niwo/分类/timestamp/uuid
 func generateObjectKey(catalog string, fileName string) (string,error){
-	timestamp := time.Now().String()
+	timestamp := time.Now().Unix()
 	uuid := uuid2.New().String()
 
-	objectKey := catalog+"/"+timestamp+uuid
+	objectKey := catalog+"-"+strconv.FormatInt(timestamp,10)+"-"+uuid
 
 	//去掉文件名称，去掉用户信息关联的敏感字眼
 	nameSplits := strings.Split(fileName, ".")
@@ -429,11 +421,11 @@ func generateObjectKey(catalog string, fileName string) (string,error){
 		seelog.Errorf("nameSplits failed")
 		//return
 	}else {
-		objectKey = objectKey+nameSplits[nameSplitsLength-1]
+		objectKey = objectKey+"."+nameSplits[nameSplitsLength-1]
 
 		//写入数据库，记录元数据，供下次拉取
 		mysqlHandle := mysql.GetMysqlDbHandle()
-		if err := mysqlHandle.FirstOrCreate(&mysql.OsObjectInfoList{ObjectKey: objectKey, Catalog:catalog}).Error;err != nil{
+		if err := mysqlHandle.Create(&mysql.OsObjectInfoList{ObjectKey: objectKey, Catalog:catalog}).Error;err != nil{
 			seelog.Errorf("push objectkey to mysql failed, err is %v", err.Error())
 			return objectKey, err
 		}

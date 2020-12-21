@@ -24,7 +24,7 @@ func GetRecordListByKey(ctx iris.Context) {
 		return
 	}
 
-	switch req.catalog {
+	switch req.Catalog {
 		case consts.PERSONAGE:
 			personageRecordList,err := GetListByKeywordFromPersonageRecord(req.Keyword)
 			if err!= nil {

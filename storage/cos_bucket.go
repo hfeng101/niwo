@@ -3,6 +3,7 @@ package storage
 import (
 	"github.com/cihub/seelog"
 	"io"
+	"io/ioutil"
 )
 
 func StorageFromIoReader (catalog string, objectKey string, file io.Reader)error{
@@ -20,18 +21,24 @@ func StorageFromIoReader (catalog string, objectKey string, file io.Reader)error
 	return nil
 }
 
-func GetObjectFromKey (catalog string, objectKey string) (io.Reader, error) {
+func GetObjectFromKey (catalog string, objectKey string) (string, error) {
 	bucketHandle,err := CosHandle.Bucket(catalog)
 	if err != nil {
 		seelog.Errorf("get bucketHandle %v failed, err is s%v", catalog,err.Error())
-		return nil, err
+		return "", err
 	}
 
-	data,err := bucketHandle.GetObject(objectKey)
+	body,err := bucketHandle.GetObject(objectKey)
 	if err != nil {
 		seelog.Errorf("Get object failed, err is %v", err.Error())
-		return nil,nil
+		return "",err
 	}
 
-	return data, nil
+	data, err := ioutil.ReadAll(body)
+	if err != nil {
+		seelog.Errorf("io Read from body failed, err is %v", err.Error())
+		return "",err
+	}
+
+	return string(data), nil
 }

@@ -11,8 +11,8 @@ type UserInfo struct {
 	PhoneNumber string `gorm:"column:phone_number;type:varchar(16)"`
 	VerificationCode string `gorm:"column:verification_code;type:varchar(8)"`
 	Email string `gorm:"column:email;type:varchar(128)"`
-	Token string `gorm:"column:token;type:varchar(64)"`
-	RefreshToken string `gorm:"column:refresh_token;type:varchar(64)"`
+	Token string `gorm:"column:token;type:varchar(256)"`
+	RefreshToken string `gorm:"column:refresh_token;type:varchar(256)"`
 	Secret string `gorm:"column:secret;type:varchar(8)"`
 	HeadImage string `gorm:"column:head_image;type:varchar(256)"`
 }

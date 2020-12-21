@@ -8,11 +8,11 @@ type ResponseContent struct {
 
 type GetRecordListByKeywordReq struct {
 	Keyword string `json:"keyword,omitempty"`
-	catalog string `json:"catalog"`
+	Catalog string `json:"catalog"`
 }
 
 type GetRecordListReq struct {
-	catalog string `json:"catalog"`
+	Catalog string `json:"catalog"`
 }
 
 type GetPersonageRecordListReq struct {

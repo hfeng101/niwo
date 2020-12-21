@@ -9,7 +9,7 @@ func GetListByKeywordFromPersonageRecord(key string)  (*[]mysql.PersonageRecordL
 
 	dbHandle := mysql.GetMysqlDbHandle()
 	//关键字模糊查找
-	dbHandle.Where("theme like", "%"+key+"%").Find(personageRecordList)
+	dbHandle.Where("theme like ?", "%"+key+"%").Find(personageRecordList)
 
 	return personageRecordList,nil
 }
@@ -19,7 +19,7 @@ func GetListByKeywordFromSportRecord(key string) (*[]mysql.SportRecordList,error
 
 	dbHandle := mysql.GetMysqlDbHandle()
 	//关键字模糊查找
-	dbHandle.Where("theme like", "%"+key+"%").Find(sportRecordList)
+	dbHandle.Where("theme like ?", "%"+key+"%").Find(sportRecordList)
 
 	return sportRecordList,nil
 }
@@ -29,7 +29,7 @@ func GetListByKeywordFromEconomicsRecord(key string) (*[]mysql.EconomicsRecordLi
 
 	dbHandle := mysql.GetMysqlDbHandle()
 	//关键字模糊查找
-	dbHandle.Where("theme like", "%"+key+"%").Find(economicsRecordList)
+	dbHandle.Where("theme like ?", "%"+key+"%").Find(economicsRecordList)
 
 	return economicsRecordList,nil
 }
@@ -39,7 +39,7 @@ func GetListByKeywordFromMilitaryRecord(key string) (*[]mysql.MilitaryRecordList
 
 	dbHandle := mysql.GetMysqlDbHandle()
 	//关键字模糊查找
-	dbHandle.Where("theme like", "%"+key+"%").Find(militaryRecordList)
+	dbHandle.Where("theme like ?", "%"+key+"%").Find(militaryRecordList)
 
 	return militaryRecordList,nil
 }
@@ -49,11 +49,12 @@ func GetListByKeywordFromEntertainmentRecord(key string) (*[]mysql.Entertainment
 
 	dbHandle := mysql.GetMysqlDbHandle()
 	//关键字模糊查找
-	dbHandle.Where("theme like", "%"+key+"%").Find(entertainmentRecordList)
+	dbHandle.Where("theme like ?", "%"+key+"%").Find(entertainmentRecordList)
 
 	return entertainmentRecordList,nil
 }
 
+//TODO
 //所有表合集
 func GetListByKeywordFromAllRecord(key string) (interface{},error){
 

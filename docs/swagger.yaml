@@ -37,21 +37,12 @@ definitions:
       theme:
         type: string
     type: object
-  v1.GetContentReq:
-    properties:
-      catalogType:
-        type: string
-      theme:
-        type: string
-      uuid:
-        type: string
-    type: object
   v1.GetRecordListByKeywordReq:
     properties:
+      catalog:
+        type: string
       keyword:
         type: string
-    type: object
-  v1.GetReferenceFileReq:
     type: object
   v1.GetVerificationCodeReq:
     properties:
@@ -81,6 +72,16 @@ definitions:
       freshToken:
         type: string
       phoneNumber:
+        type: string
+    type: object
+  v1.UploadFileReq:
+    properties:
+      catalog:
+        type: string
+      name:
+        type: string
+      type:
+        description: 类型有file/picture/short-video/long-video/audio
         type: string
     type: object
   v1.UserRegistrationOrLoginReq:
@@ -222,11 +223,10 @@ paths:
       description: 用户获取图片、音、视频文件
       parameters:
       - description: param
-        in: body
-        name: Param
+        in: query
+        name: objectKey
         required: true
-        schema:
-          $ref: '#/definitions/v1.GetReferenceFileReq'
+        type: string
       produces:
       - application/json
       responses:
@@ -243,11 +243,20 @@ paths:
       description: 获取指定主题的具体内容
       parameters:
       - description: param
-        in: body
-        name: Param
+        in: query
+        name: catalog
         required: true
-        schema:
-          $ref: '#/definitions/v1.GetContentReq'
+        type: string
+      - description: param
+        in: query
+        name: theme
+        required: true
+        type: string
+      - description: param
+        in: query
+        name: uuid
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -308,7 +317,7 @@ paths:
         name: Param
         required: true
         schema:
-          $ref: '#/definitions/v1.UpdateContentReq'
+          $ref: '#/definitions/v1.UploadFileReq'
       produces:
       - application/json
       responses:

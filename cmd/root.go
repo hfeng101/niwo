@@ -21,7 +21,8 @@ import (
   "github.com/cihub/seelog"
   "github.com/hfeng101/niwo/storage"
 	"github.com/hfeng101/niwo/storage/mysql"
-	"github.com/hfeng101/niwo/utils/config"
+  "github.com/hfeng101/niwo/utils/cloud"
+  "github.com/hfeng101/niwo/utils/config"
   "github.com/hfeng101/niwo/utils/logger"
   "github.com/spf13/cobra"
   "os"
@@ -133,7 +134,8 @@ func run(cmd *cobra.Command, args []string) {
       &mysql.MilitaryRecordList{},
       &mysql.PersonageRecordList{},
       &mysql.SportRecordList{},
-      &mysql.EntertainmentRecordList{}) == nil {
+      &mysql.EntertainmentRecordList{},
+      &mysql.OsObjectInfoList{}) == nil {
     seelog.Errorf("AutoMigrate failed")
     return
   }
@@ -156,12 +158,23 @@ func run(cmd *cobra.Command, args []string) {
     seelog.Errorf("InitCos failed, err is %v", err.Error())
     return
   }
-  cosHandle := storage.GetCosHandle()
-  if cosHandle == nil {
+
+  if storage.GetCosHandle() == nil {
     seelog.Errorf("cosHandle failed, mysql init failed")
     return
   }
   defer storage.DestroyCosHandle()
+
+  if err := cloud.InitAliyun(); err != nil {
+    seelog.Errorf("InitAliyun failed, err is %v", err.Error())
+    return
+  }
+
+  if cloud.GetDysmsapiHandle() == nil {
+    seelog.Errorf("cosHandle failed, mysql init failed")
+    return
+  }
+  defer cloud.DestroyDysmsapiHandle()
 
   //start iris app
   exitChan := make(chan struct{})
